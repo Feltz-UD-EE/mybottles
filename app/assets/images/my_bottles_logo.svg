@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="64" viewBox="0 0 240 64" role="img" aria-labelledby="title">
+  <title id="title">My Bottles</title>
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="#ffffff" stroke="#7c1f2b" stroke-width="4"/>
+  <path fill="#7c1f2b" d="M21 8h11c1 0 2 1 2 2v25c0 3 1 5 4 8l5 5c3 3 4 6 4 10v58c0 4-3 7-7 7H17c-4 0-7-3-7-7V58c0-4 1-7 4-10l5-5c3-3 4-5 4-8V10c0-1 1-2 2-2z" transform="translate(2 -56) scale(1 1.44)"/>
+  <path fill="#c99a43" d="M41 25h15v13c0 6-4 11-8 13v7h-4v-7c-4-2-8-7-8-13V25h5zm0 6v7c0 5 3 8 6 8s6-3 6-8v-7H41z"/>
+  <text x="78" y="41" fill="#342729" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="28" font-weight="700">My Bottles</text>
+</svg>
