@@ -1,0 +1,30 @@
+<header class="site-header" data-controller="menu">
+  <div class="site-header__inner">
+    <%= link_to root_path, class: "site-logo", aria: { label: "My Bottles home" } do %>
+      <%= image_tag "my_bottles_mark.svg", class: "site-logo__mark", alt: "" %>
+      <span class="site-logo__text">My Bottles</span>
+    <% end %>
+
+    <button class="menu-toggle" type="button" data-action="menu#toggle" data-menu-target="button" aria-controls="primary-menu" aria-expanded="false">
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+      <span class="menu-toggle__bar"></span>
+      <span class="visually-hidden">Open menu</span>
+    </button>
+
+    <nav id="primary-menu" class="primary-menu" data-menu-target="panel" aria-label="Main menu">
+      <ul class="primary-menu__list">
+        <li class="primary-menu__item primary-menu__item--has-children">
+          <a class="primary-menu__link primary-menu__link--placeholder" href="#" aria-disabled="true" data-action="click->menu#ignorePlaceholder">My Cellars</a>
+          <ul class="primary-menu__submenu" aria-label="My Cellars submenu">
+            <li><a class="primary-menu__link primary-menu__link--placeholder" href="#" aria-disabled="true" data-action="click->menu#ignorePlaceholder">Cellar Overview</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <button class="theme-toggle" type="button" data-action="theme#toggle" data-theme-target="button" aria-pressed="false">
+        <span data-theme-target="label">Dark mode</span>
+      </button>
+    </nav>
+  </div>
+</header>
