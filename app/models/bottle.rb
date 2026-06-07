@@ -2,6 +2,7 @@ class Bottle < ApplicationRecord
   DISPOSAL_METHODS = %w[Drink Gift Sale Spoiled].freeze
 
   belongs_to :vintage
+  has_many :tasting_notes, as: :tasteable, dependent: :restrict_with_error
 
   before_validation :normalize_blank_disposal_method
 
@@ -15,6 +16,14 @@ class Bottle < ApplicationRecord
 
   def to_s
     [ personal_inventory, vintage.to_s ].compact_blank.join(" - ")
+  end
+
+  def display_name
+    vintage.display_name
+  end
+
+  def inventory_display_name
+    [ personal_inventory, display_name ].compact_blank.join(" - ")
   end
 
   private

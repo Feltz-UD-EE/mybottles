@@ -27,18 +27,18 @@ at a winery or retailer.
 
 Tasting notes will have a polymorphic relationship, `tasteable`, so that they can belong to either a bottle or a vintage.
 
-| Name        | Data type | Relationships | Description                                                                     | Constraints                     | Notes                                                            |
-|-------------|-----------|---------------|---------------------------------------------------------------------------------|---------------------------------|------------------------------------------------------------------| 
-| date        | date      |               | The date the tasting took place                                                 | not nil                         |                                                                  | 
-| setting     | text      |               | The setting where the tasting took place                                        |                                 | This may eventually become a reference to producer or a retailer | 
-| temperature | text      |               | The temperature of the wine                                                     |                                 |                                                                  | 
-| pairing     | text      |               | Any accompanying food                                                           |                                 |                                                                  | 
-| color       | text      |               | The color of the wine                                                           |                                 |                                                                  |
-| nose        | text      |               | The aromatic elements of the wine                                               |                                 |                                                                  | 
-| palate      | text      |               | The taste elements of the wine                                                  |                                 |                                                                  | 
-| overall     | text      |               | The overall impression of the wine                                              |                                 |                                                                  |
-| score       | decimal   |               | The contact phone number of the producer                                        | 1 digit after the decimal point |                                                                  |
-| buy         | boolean   |               | Should I buy this wine (or buy it again if the tasting note refers to a bottle) | not nil                         | Default = false                                                  | 
+| Name        | Data type | Relationships | Description                                                                     | Constraints                     | Notes                                                                                                                            |
+|-------------|-----------|---------------|---------------------------------------------------------------------------------|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------| 
+| date        | date      |               | The date the tasting took place                                                 | not nil                         |                                                                                                                                  | 
+| setting     | text      |               | The setting where the tasting took place                                        |                                 | This may eventually become a reference to producer or a retailer                                                                 | 
+| temperature | text      |               | The temperature of the wine                                                     |                                 |                                                                                                                                  | 
+| pairing     | text      |               | Any accompanying food                                                           |                                 |                                                                                                                                  | 
+| color       | text      |               | The color of the wine                                                           |                                 |                                                                                                                                  |
+| nose        | text      |               | The aromatic elements of the wine                                               |                                 |                                                                                                                                  | 
+| palate      | text      |               | The taste elements of the wine                                                  |                                 |                                                                                                                                  | 
+| overall     | text      |               | The overall impression of the wine                                              |                                 |                                                                                                                                  |
+| score       | decimal   |               | The personal numeric score given to the wine (optional)                         | 1 digit after the decimal point | There are multiple scoring systems used by professional and amateur tasters and this project will be agnostic about which to use |
+| buy         | boolean   |               | Should I buy this wine (or buy it again if the tasting note refers to a bottle) | not nil                         | Default = false                                                                                                                  | 
 
 Also add the tasteable_type and tasteable_id columns in appropriate Rails polymorphic form 
 
@@ -46,7 +46,7 @@ Also add the tasteable_type and tasteable_id columns in appropriate Rails polymo
 
 Add a link from the bottle show page to a new tasting note form, using a button labelled "Tasted This". This should pre-load
 the bottle information into the appropriate visible and hidden form elements.  When a tasting note created from this path is saved, 
-it should also update the bottle so that the disposal date is equal to the tasting note date, and the disposal method is set to 'drink'.
+it should also update the bottle so that the disposal date is equal to the tasting note date, and the disposal method is set to 'Drink'.
 
 Add a link on the home page to a new tasting note form, using a button labelled "Let's Taste!". This should show a version of the
 form with a type-ahead box to find a vintage.  There should be a button on the side of that type-ahead box "New wine" which leads to a compact
@@ -61,9 +61,9 @@ There should be two save buttons at the bottom of this form:
 
 Build seeds for tasting notes from this [Google Sheet](https://docs.google.com/spreadsheets/d/1lPUTOZjWJbnqO_AGktr04ppRzjUZISxspiTCgLuROt0/edit?usp=sharing), 
 tabs labelled "Retail YYYY" or "Michigan YYYY" only, using the following rules:
-* Extract the text from the Tasting column and put it in the overall attribute.
-* If there is anything in the Tasting column about purchasing the wine again, set 
-* If there is any text in the tasting column that is specifically about color or aroma, extract that information and 
+* Extract the text from the Tasted column and put it in the overall attribute.
+* If there is anything in the Tasted column about purchasing the wine again, set buy = True
+* If there is any text in the Tasted column that is specifically about color or aroma, extract that information and 
 place it in the color or nose attributes.
 
 Let me manually examine this seeds file before attempting to use it.

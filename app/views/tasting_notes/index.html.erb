@@ -1,0 +1,48 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Tasting Notes</h1>
+    <%= link_to "New tasting note", new_tasting_note_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="tasting-note-search">Search tasting notes</label>
+      <input id="tasting-note-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="date">Date</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="wine">Wine</button></th>
+            <th>Setting</th>
+            <th>Overall</th>
+            <th>Buy</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tasting_notes.each do |tasting_note| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="date"><%= tasting_note.date&.iso8601 %></td>
+              <td data-table-sort-value="wine"><%= link_to tasting_note.tasteable_name, tasting_note %></td>
+              <td><%= tasting_note.setting %></td>
+              <td><%= truncate(tasting_note.overall, length: 90) %></td>
+              <td><%= tasting_note.buy_label %></td>
+              <td class="actions"><%= link_to "Edit", edit_tasting_note_path(tasting_note) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No tasting notes yet." if @tasting_notes.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

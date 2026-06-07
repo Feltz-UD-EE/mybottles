@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_06_213038) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_125000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -42,6 +42,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_06_213038) do
     t.datetime "updated_at", null: false
     t.check_constraint "email IS NULL OR email = ''::text OR email ~* '^[^@[:space:]]+@[^@[:space:]]+[.][^@[:space:]]+$'::text", name: "chk_producers_email_format"
     t.check_constraint "website IS NULL OR website = ''::text OR website ~* '^https?://[^[:space:]]+$'::text", name: "chk_producers_website_http_url"
+  end
+
+  create_table "tasting_notes", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Tasting Notes are personal notes about tasting wine - from a particular bottle, or from a representative wine & vintage at a winery or retailer.", force: :cascade do |t|
+    t.string "tasteable_type", null: false
+    t.uuid "tasteable_id", null: false, comment: "The bottle or vintage being tasted"
+    t.date "date", null: false, comment: "The date the tasting took place"
+    t.text "setting", comment: "The setting where the tasting took place"
+    t.text "temperature", comment: "The temperature of the wine"
+    t.text "pairing", comment: "Any accompanying food"
+    t.text "color", comment: "The color of the wine"
+    t.text "nose", comment: "The aromatic elements of the wine"
+    t.text "palate", comment: "The taste elements of the wine"
+    t.text "overall", comment: "The overall impression of the wine"
+    t.decimal "score", precision: 10, scale: 1, comment: "The personal numeric score given to the wine (optional)"
+    t.boolean "buy", comment: "Should I buy this wine (or buy it again if the tasting note refers to a bottle)"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tasteable_type", "tasteable_id"], name: "index_tasting_notes_on_tasteable"
   end
 
   create_table "vintages", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Vintages are individual 'editions' of a wine. Vintages are usually named after the year that the grapes are harvested. Because producers sometimes blend across year boundaries, some vintages are edition names or numbers, or are just labelled as \"non-vintage\".", force: :cascade do |t|

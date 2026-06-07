@@ -1,0 +1,35 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @tasting_note.tasteable_name %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_tasting_note_path(@tasting_note) %>
+      <%= link_to "Back to tasting notes", tasting_notes_path %>
+      <%= button_to "Delete", @tasting_note, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this tasting note?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Date</dt>
+    <dd><%= @tasting_note.date&.iso8601 %></dd>
+    <dt>Wine</dt>
+    <dd><%= link_to @tasting_note.tasteable_name, @tasting_note.tasteable %></dd>
+    <dt>Setting</dt>
+    <dd><%= @tasting_note.setting %></dd>
+    <dt>Temperature</dt>
+    <dd><%= @tasting_note.temperature %></dd>
+    <dt>Pairing</dt>
+    <dd><%= @tasting_note.pairing %></dd>
+    <dt>Color</dt>
+    <dd><%= @tasting_note.color %></dd>
+    <dt>Nose</dt>
+    <dd><%= simple_format(@tasting_note.nose) %></dd>
+    <dt>Palate</dt>
+    <dd><%= simple_format(@tasting_note.palate) %></dd>
+    <dt>Overall</dt>
+    <dd><%= simple_format(@tasting_note.overall) %></dd>
+    <dt>Score</dt>
+    <dd><%= @tasting_note.score %></dd>
+    <dt>Buy</dt>
+    <dd><%= @tasting_note.buy_label %></dd>
+  </dl>
+</main>

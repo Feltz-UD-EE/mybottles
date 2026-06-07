@@ -2,6 +2,7 @@
   <div class="page-header">
     <h1><%= @producer.name %> - <%= @wine.name %> - <%= @vintage.vintage %></h1>
     <div class="actions">
+      <%= link_to "Tasted This", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: @bottle.id }), class: "button button--primary" %>
       <%= link_to "Edit", edit_bottle_path(@bottle) %>
       <%= link_to "Back to bottles", bottles_path %>
       <%= button_to "Delete", @bottle, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this bottle?" } } %>

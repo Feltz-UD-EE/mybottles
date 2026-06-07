@@ -1,0 +1,116 @@
+<%= form_with(model: tasting_note, class: "resource-form tasting-note-form", data: { controller: "tasting-note" }) do |form| %>
+  <%= render "shared/errors", resource: tasting_note %>
+
+  <% if tasting_note.tasteable.is_a?(Bottle) %>
+    <section class="form-panel">
+      <h2>Bottle</h2>
+      <p><%= link_to tasting_note.tasteable_name, tasting_note.tasteable %></p>
+      <%= hidden_field_tag "tasting_note[tasteable_type]", "Bottle" %>
+      <%= hidden_field_tag "tasting_note[tasteable_id]", tasting_note.tasteable.id %>
+    </section>
+  <% elsif tasting_note.persisted? && tasting_note.tasteable.present? %>
+    <section class="form-panel">
+      <h2>Wine</h2>
+      <p><%= link_to tasting_note.tasteable_name, tasting_note.tasteable %></p>
+      <%= hidden_field_tag "tasting_note[tasteable_type]", tasting_note.tasteable_type %>
+      <%= hidden_field_tag "tasting_note[tasteable_id]", tasting_note.tasteable_id %>
+    </section>
+  <% else %>
+    <section class="form-panel">
+      <h2>Wine</h2>
+      <%= hidden_field_tag "tasting_note[tasteable_type]", "Vintage" %>
+      <%= hidden_field_tag "tasting_note[tasteable_id]", tasting_note.tasteable_id, data: { tasting_note_target: "tasteableId" } %>
+
+      <div class="field field-with-action">
+        <div>
+          <%= label_tag "tasting_note_vintage_lookup", "Vintage" %>
+          <%= text_field_tag "tasting_note[vintage_lookup]", tasting_note.tasteable.present? ? tasting_note.tasteable_name : nil, list: "vintage-options", data: { tasting_note_target: "vintageInput", action: "input->tasting-note#selectVintage" } %>
+          <datalist id="vintage-options">
+            <% @vintage_options.each do |vintage| %>
+              <option value="<%= "#{vintage.wine.producer.name} - #{vintage.wine.name} - #{vintage.vintage}" %>" data-id="<%= vintage.id %>"></option>
+            <% end %>
+          </datalist>
+        </div>
+        <button class="button" type="button" data-action="tasting-note#showNewWine">New wine</button>
+      </div>
+
+      <div class="inline-fields" data-tasting-note-target="newWineFields" hidden>
+        <div class="field">
+          <%= label_tag "new_wine_producer_name", "Producer" %>
+          <%= text_field_tag "new_wine[producer_name]" %>
+        </div>
+        <div class="field">
+          <%= label_tag "new_wine_wine_name", "Wine" %>
+          <%= text_field_tag "new_wine[wine_name]" %>
+        </div>
+        <div class="field">
+          <%= label_tag "new_wine_vintage", "Vintage" %>
+          <%= text_field_tag "new_wine[vintage]", nil, placeholder: "(year, batch, or NV)" %>
+        </div>
+        <div class="field">
+          <%= label_tag "new_wine_appellation", "Appellation" %>
+          <%= text_field_tag "new_wine[appellation]" %>
+        </div>
+        <div class="field">
+          <%= label_tag "new_wine_grapes", "Grapes" %>
+          <%= text_area_tag "new_wine[grapes]" %>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :date %>
+    <%= form.date_field :date, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :setting %>
+    <%= form.text_field :setting %>
+  </div>
+
+  <div class="field">
+    <%= form.label :temperature %>
+    <%= form.text_field :temperature %>
+  </div>
+
+  <div class="field">
+    <%= form.label :pairing %>
+    <%= form.text_field :pairing %>
+  </div>
+
+  <div class="field">
+    <%= form.label :color %>
+    <%= form.text_field :color %>
+  </div>
+
+  <div class="field">
+    <%= form.label :nose %>
+    <%= form.text_area :nose %>
+  </div>
+
+  <div class="field">
+    <%= form.label :palate %>
+    <%= form.text_area :palate %>
+  </div>
+
+  <div class="field">
+    <%= form.label :overall %>
+    <%= form.text_area :overall %>
+  </div>
+
+  <div class="field">
+    <%= form.label :score %>
+    <%= form.number_field :score, step: "0.1" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :buy %>
+    <%= form.select :buy, [["", nil], ["Yes", true], ["No", false]] %>
+  </div>
+
+  <div class="form-actions">
+    <button class="button button--primary" type="submit" name="finish_action" value="done">Done Tasting</button>
+    <button class="button" type="submit" name="finish_action" value="taste_another">Taste Another</button>
+  </div>
+<% end %>

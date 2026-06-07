@@ -3,6 +3,7 @@ require "csv"
 require "date"
 
 PURCHASE_SEED_PATH = Rails.root.join("db/seeds/purchases.csv")
+TASTING_NOTE_SEED_PATH = Rails.root.join("db/seeds/tasting_notes.csv")
 
 def seed_blank(value)
   value = value.to_s.strip
@@ -17,6 +18,14 @@ end
 def seed_decimal(value)
   value = seed_blank(value)
   value ? BigDecimal(value) : nil
+end
+
+def seed_boolean(value)
+  value = seed_blank(value)
+  return true if value == "true"
+  return false if value == "false"
+
+  nil
 end
 
 purchase_rows = CSV.read(PURCHASE_SEED_PATH, headers: true)
@@ -57,4 +66,27 @@ purchase_rows.each do |row|
     disposal_method: seed_blank(row["disposal_method"])
   )
   bottle.save!
+end
+
+if TASTING_NOTE_SEED_PATH.exist?
+  CSV.foreach(TASTING_NOTE_SEED_PATH, headers: true) do |row|
+    bottle = Bottle.find_by!(personal_inventory: seed_blank(row["personal_inventory"]))
+
+    tasting_note = TastingNote.find_or_initialize_by(
+      tasteable: bottle,
+      date: seed_date(row["date"]),
+      overall: seed_blank(row["overall"])
+    )
+    tasting_note.assign_attributes(
+      setting: seed_blank(row["setting"]),
+      temperature: seed_blank(row["temperature"]),
+      pairing: seed_blank(row["pairing"]),
+      color: seed_blank(row["color"]),
+      nose: seed_blank(row["nose"]),
+      palate: seed_blank(row["palate"]),
+      score: seed_decimal(row["score"]),
+      buy: seed_boolean(row["buy"])
+    )
+    tasting_note.save!
+  end
 end

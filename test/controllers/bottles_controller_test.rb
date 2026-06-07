@@ -8,7 +8,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "lists bottles with dynamic table UI" do
-    Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink")
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink")
 
     get bottles_url
 
@@ -18,15 +18,17 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", "A-001"
     assert_select "td", "Producer - Estate Red - 2024"
     assert_select "td", "2026-06-06"
+    assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
   end
 
-  test "show title includes producer wine and vintage" do
+  test "show title includes producer wine and vintage and tasting note launch" do
     bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
 
     get bottle_url(bottle)
 
     assert_response :success
     assert_select "h1", "Producer - Estate Red - 2024"
+    assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
   end
 
   test "creates updates and deletes bottle" do

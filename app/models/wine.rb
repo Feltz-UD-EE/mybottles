@@ -16,6 +16,10 @@ class Wine < ApplicationRecord
     name
   end
 
+  def display_name
+    [ producer.name, name ].compact_blank.join(" - ")
+  end
+
   private
 
   def producer_id_cannot_change

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   resources :wines
   resources :vintages
   resources :bottles
+  resources :tasting_notes
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
