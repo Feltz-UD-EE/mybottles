@@ -1,0 +1,37 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @wine_club.display_name %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_wine_club_path(@wine_club) %>
+      <%= link_to "Back to clubs", wine_clubs_path %>
+      <%= button_to "Delete", @wine_club, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this club?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Producer</dt>
+    <dd><%= link_to @wine_club.producer.name, @wine_club.producer %></dd>
+    <dt>Tier</dt>
+    <dd><%= @wine_club.tier %></dd>
+    <dt>Size</dt>
+    <dd><%= @wine_club.size %></dd>
+    <dt>Schedule</dt>
+    <dd><%= @wine_club.schedule %></dd>
+    <dt>Delivery method</dt>
+    <dd><%= @wine_club.delivery_method %></dd>
+    <dt>Payment method</dt>
+    <dd><%= @wine_club.payment_method %></dd>
+    <dt>Discount</dt>
+    <dd><%= "#{@wine_club.discount}%" if @wine_club.discount.present? %></dd>
+    <dt>Date joined</dt>
+    <dd><%= @wine_club.date_joined&.iso8601 %></dd>
+    <dt>Date left</dt>
+    <dd><%= @wine_club.date_left&.iso8601 %></dd>
+    <dt>Current member</dt>
+    <dd><%= @wine_club.current_member? ? "Yes" : "No" %></dd>
+    <dt>Member ID</dt>
+    <dd><%= @wine_club.member_id %></dd>
+    <dt>Benefits</dt>
+    <dd><%= simple_format(@wine_club.benefits) %></dd>
+  </dl>
+</main>

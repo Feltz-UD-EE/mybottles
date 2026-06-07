@@ -11,6 +11,9 @@ Rails.application.routes.draw do
   resources :vintages
   resources :bottles
   resources :tasting_notes
+  resources :wine_clubs do
+    get :all, on: :collection
+  end
   resources :watch_list_entries do
     get :old_entries, on: :collection
     patch :remove, on: :member

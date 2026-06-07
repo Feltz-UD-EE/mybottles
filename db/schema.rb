@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_07_131000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_133000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -84,6 +84,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_131000) do
     t.index ["watchable_type", "watchable_id"], name: "index_watch_list_entries_on_watchable"
   end
 
+  create_table "wine_clubs", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Wine clubs are subscription memberships offered by wineries that include such features as discounts, free or reduced shipping, access to special wines, preferential treatment at the producer's tasting rooms, invitations to special events, etc. A given producer will typically offer several wine club tiers.", force: :cascade do |t|
+    t.uuid "producer_id", null: false, comment: "The producer offering the wine club"
+    t.text "tier", comment: "The tier title of the club membership - like gold, reserve, etc."
+    t.integer "size", null: false, comment: "The number of bottles in each club order"
+    t.text "schedule", null: false, comment: "How often and when wine is delivered"
+    t.text "delivery_method", comment: "Whether the wine is shipped or held for pickup"
+    t.text "payment_method", comment: "How the club membership is paid for (typically a pre-approved credit card)"
+    t.decimal "discount", precision: 5, scale: 2, comment: "What discount the club order is processed at relative to list price"
+    t.date "date_joined", comment: "When I joined the wine club"
+    t.date "date_left", comment: "When I cancelled my wine club membership"
+    t.text "member_id", comment: "An ID supplied by the producer"
+    t.text "benefits", comment: "Any other benefits accruing to club members"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["producer_id"], name: "index_wine_clubs_on_producer_id"
+    t.check_constraint "delivery_method IS NULL OR (delivery_method = ANY (ARRAY['Shipping'::text, 'Pickup'::text]))", name: "chk_wine_clubs_delivery_method"
+    t.check_constraint "discount IS NULL OR discount >= 0::numeric AND discount <= 100::numeric", name: "chk_wine_clubs_discount_percentage"
+  end
+
   create_table "wines", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Wines are named wine brands. A wine belongs to a producer.", force: :cascade do |t|
     t.text "name", null: false, comment: "The legal trade name of the wine"
     t.text "description", comment: "A description of the wine"
@@ -100,5 +119,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_131000) do
 
   add_foreign_key "bottles", "vintages", on_delete: :restrict
   add_foreign_key "vintages", "wines", on_delete: :restrict
+  add_foreign_key "wine_clubs", "producers", on_delete: :restrict
   add_foreign_key "wines", "producers", on_delete: :restrict
 end

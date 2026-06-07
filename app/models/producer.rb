@@ -3,6 +3,7 @@ class Producer < ApplicationRecord
   HTTP_URL_FORMAT = /\Ahttps?:\/\/\S+\z/
 
   has_many :wines, dependent: :restrict_with_error
+  has_many :wine_clubs, dependent: :restrict_with_error
   has_many :vintages, through: :wines
   has_many :bottles, through: :vintages
   has_many :bottles_in_inventory, -> { where(disposal_date: nil) }, through: :vintages, source: :bottles
