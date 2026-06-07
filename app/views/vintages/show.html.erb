@@ -2,6 +2,7 @@
   <div class="page-header">
     <h1><%= @vintage.wine.producer.name %> - <%= @vintage.wine.name %> - <%= @vintage.vintage %></h1>
     <div class="actions">
+      <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), class: "button button--primary" %>
       <%= link_to "Edit", edit_vintage_path(@vintage) %>
       <%= link_to "Back to vintages", vintages_path %>
       <%= button_to "Delete", @vintage, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this vintage?" } } %>

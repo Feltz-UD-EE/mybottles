@@ -16,6 +16,7 @@ class WinesControllerTest < ActionDispatch::IntegrationTest
     assert_select "tbody tr:first-child td:first-child", "Producer"
     assert_select "a[href=?]", wine_path(wine), "Estate Rosé"
     assert_select "td.actions a", text: "Show", count: 0
+    assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Wine", watchable_id: wine.id }), text: "Add to Watch List"
   end
 
   test "creates updates and blocks producer changes" do
@@ -47,6 +48,7 @@ class WinesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Producer - Estate Red"
+    assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Wine", watchable_id: wine.id }), text: "Add to Watch List"
     assert_select "h2", "Bottles Purchased by Vintage"
     assert_select "tr", text: /2023\s+1\s+1/
     assert_select "tr", text: /2024\s+3\s+2/

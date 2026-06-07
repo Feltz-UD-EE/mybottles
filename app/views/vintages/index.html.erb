@@ -29,6 +29,7 @@
               <td data-table-sort-value="vintage"><%= link_to vintage.vintage, vintage %></td>
               <td><%= vintage.grapes %></td>
               <td class="actions">
+                <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: vintage.id }) %>
                 <%= link_to "Show", vintage %>
                 <%= link_to "Edit", edit_vintage_path(vintage) %>
               </td>

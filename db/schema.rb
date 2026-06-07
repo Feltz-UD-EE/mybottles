@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_07_125000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_131000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -69,6 +69,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_125000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["wine_id"], name: "index_vintages_on_wine_id"
+  end
+
+  create_table "watch_list_entries", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Watch list entries are vintages, wines, or general information about wines I want to purchase in the future.", force: :cascade do |t|
+    t.string "watchable_type"
+    t.uuid "watchable_id", comment: "The wine or vintage to watch for"
+    t.text "description", null: false, comment: "The motivation or justification for looking for this wine"
+    t.text "quantity", comment: "How much to purchase"
+    t.text "caveat", comment: "Description of why not to buy the wine if it is available - too expensive, bad vintage, etc."
+    t.text "notes", comment: "Any additional information about this entry, including exclusive retailers, date of availability, etc."
+    t.datetime "deleted_at", comment: "When this watch list entry was soft-deleted"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["watchable_type", "watchable_id"], name: "index_watch_list_entries_on_watchable"
   end
 
   create_table "wines", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Wines are named wine brands. A wine belongs to a producer.", force: :cascade do |t|

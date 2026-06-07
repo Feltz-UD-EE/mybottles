@@ -6,6 +6,7 @@ class Wine < ApplicationRecord
   has_many :vintages, dependent: :restrict_with_error
   has_many :bottles, through: :vintages
   has_many :bottles_in_inventory, -> { where(disposal_date: nil) }, through: :vintages, source: :bottles
+  has_many :watch_list_entries, as: :watchable, dependent: :restrict_with_error
 
   validates :name, presence: true
   validates :style, inclusion: { in: STYLES }, allow_blank: true

@@ -52,3 +52,5 @@ that makes a watch list entry un-deleted.
 On the existing wine, vintage, and bottle show pages and index pages, there should be a button labelled "Add to Watch List"; which leads to the new
 watch list entry form page, preloaded with watchable_type = wine if from the wine page, and with watchable_type = vintage if from the vintage or
 bottle page.
+
+On any tasting note form, if the "buy again" button is checked, the vintage/wine automatically gets added to the watch list.

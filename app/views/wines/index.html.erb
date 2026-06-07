@@ -31,6 +31,7 @@
               <td><%= wine.color %></td>
               <td><%= wine.appellation %></td>
               <td class="actions">
+                <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Wine", watchable_id: wine.id }) %>
                 <%= link_to "Edit", edit_wine_path(wine) %>
               </td>
             </tr>

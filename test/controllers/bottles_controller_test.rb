@@ -18,6 +18,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", "A-001"
     assert_select "td", "Producer - Estate Red - 2024"
     assert_select "td", "2026-06-06"
+    assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
   end
 
@@ -28,6 +29,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Producer - Estate Red - 2024"
+    assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
   end
 

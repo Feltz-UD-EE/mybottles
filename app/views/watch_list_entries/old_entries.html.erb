@@ -1,0 +1,8 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Old Watch List Entries</h1>
+    <%= link_to "Back to watch list", watch_list_entries_path, class: "button" %>
+  </div>
+
+  <%= render "table", watch_list_entries: @watch_list_entries, deleted: true %>
+</main>

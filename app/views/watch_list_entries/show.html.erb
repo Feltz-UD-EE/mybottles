@@ -1,0 +1,33 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Watch List Entry</h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_watch_list_entry_path(@watch_list_entry) %>
+      <%= link_to "Back to watch list", watch_list_entries_path %>
+      <% if @watch_list_entry.deleted? %>
+        <%= button_to "Restore", restore_watch_list_entry_path(@watch_list_entry), method: :patch, class: "button" %>
+      <% else %>
+        <%= button_to "Remove", remove_watch_list_entry_path(@watch_list_entry), method: :patch, class: "button button--danger" %>
+      <% end %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Wine</dt>
+    <dd>
+      <% if @watch_list_entry.watchable.present? %>
+        <%= link_to @watch_list_entry.watchable_name, @watch_list_entry.watchable %>
+      <% end %>
+    </dd>
+    <dt>Description</dt>
+    <dd><%= simple_format(@watch_list_entry.description) %></dd>
+    <dt>Quantity</dt>
+    <dd><%= @watch_list_entry.quantity %></dd>
+    <dt>Caveat</dt>
+    <dd><%= simple_format(@watch_list_entry.caveat) %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@watch_list_entry.notes) %></dd>
+    <dt>Deleted At</dt>
+    <dd><%= @watch_list_entry.deleted_at&.strftime("%Y-%m-%d") %></dd>
+  </dl>
+</main>

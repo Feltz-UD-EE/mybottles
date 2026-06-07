@@ -26,6 +26,7 @@ class TastingNotesController < ApplicationController
 
     if @tasting_note.save
       update_tasted_bottle
+      add_watch_list_entry
       redirect_after_create
     else
       render :new, status: :unprocessable_entity
@@ -115,6 +116,16 @@ class TastingNotesController < ApplicationController
       disposal_date: @tasting_note.date,
       disposal_method: "Drink"
     )
+  end
+
+  def add_watch_list_entry
+    return unless @tasting_note.buy == true
+
+    vintage = @tasting_note.vintage
+    WatchListEntry.active.find_or_create_by!(watchable: vintage) do |entry|
+      entry.description = "Buy again based on tasting note from #{@tasting_note.date.iso8601}"
+      entry.notes = @tasting_note.overall
+    end
   end
 
   def redirect_after_create

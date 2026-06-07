@@ -11,6 +11,11 @@ Rails.application.routes.draw do
   resources :vintages
   resources :bottles
   resources :tasting_notes
+  resources :watch_list_entries do
+    get :old_entries, on: :collection
+    patch :remove, on: :member
+    patch :restore, on: :member
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -1,0 +1,8 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>New Watch List Entry</h1>
+    <%= link_to "Back to watch list", watch_list_entries_path, class: "button" %>
+  </div>
+
+  <%= render "form", watch_list_entry: @watch_list_entry %>
+</main>

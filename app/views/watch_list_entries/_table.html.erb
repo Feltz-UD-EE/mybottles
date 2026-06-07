@@ -1,0 +1,59 @@
+<section data-controller="table" data-table-per-page-value="25">
+  <div class="table-toolbar">
+    <label for="<%= deleted ? "old-watch-list-search" : "watch-list-search" %>">Search watch list</label>
+    <input id="<%= deleted ? "old-watch-list-search" : "watch-list-search" %>" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th><button type="button" data-action="table#sort" data-table-column="wine">Wine</button></th>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Caveat</th>
+          <th>Notes</th>
+          <% if deleted %>
+            <th>Deleted At</th>
+          <% end %>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% watch_list_entries.each do |entry| %>
+          <tr data-table-target="row">
+            <td data-table-sort-value="wine">
+              <% if entry.watchable.present? %>
+                <%= link_to entry.watchable_name, entry.watchable %>
+              <% end %>
+            </td>
+            <td><%= truncate(entry.description, length: 90) %></td>
+            <td><%= entry.quantity %></td>
+            <td><%= truncate(entry.caveat, length: 90) %></td>
+            <td><%= truncate(entry.notes, length: 90) %></td>
+            <% if deleted %>
+              <td><%= entry.deleted_at&.strftime("%Y-%m-%d") %></td>
+            <% end %>
+            <td class="actions">
+              <%= link_to "Show", entry %>
+              <%= link_to "Edit", edit_watch_list_entry_path(entry) %>
+              <% if deleted %>
+                <%= button_to "Restore", restore_watch_list_entry_path(entry), method: :patch, class: "button" %>
+              <% else %>
+                <%= button_to "Remove", remove_watch_list_entry_path(entry), method: :patch, class: "button button--danger" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="empty-state"><%= deleted ? "No previous watch list items." : "No watch list entries yet." if watch_list_entries.empty? %></p>
+
+  <div class="table-pagination">
+    <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+    <span data-table-target="pageLabel">Page 1</span>
+    <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+  </div>
+</section>

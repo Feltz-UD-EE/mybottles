@@ -27,22 +27,25 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='tasting_note[tasteable_id]'][value=?]", @bottle.id
 
     assert_difference("TastingNote.count", 1) do
-      post tasting_notes_url, params: {
-        tasting_note: {
-          tasteable_type: "Bottle",
-          tasteable_id: @bottle.id,
-          date: "2026-06-07",
-          setting: "Home",
-          overall: "Very nice.",
-          buy: "1"
-        },
-        finish_action: "done"
-      }
+      assert_difference("WatchListEntry.count", 1) do
+        post tasting_notes_url, params: {
+          tasting_note: {
+            tasteable_type: "Bottle",
+            tasteable_id: @bottle.id,
+            date: "2026-06-07",
+            setting: "Home",
+            overall: "Very nice.",
+            buy: "1"
+          },
+          finish_action: "done"
+        }
+      end
     end
 
     assert_redirected_to root_url
     assert_equal Date.new(2026, 6, 7), @bottle.reload.disposal_date
     assert_equal "Drink", @bottle.disposal_method
+    assert_equal @vintage, WatchListEntry.last.watchable
   end
 
   test "new tasting note renders vintage picker without validation errors" do
@@ -55,18 +58,20 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "creates tasting note for existing vintage and taste another preserves date and setting" do
-    assert_difference("TastingNote.count", 1) do
-      post tasting_notes_url, params: {
-        tasting_note: {
-          tasteable_type: "Vintage",
-          tasteable_id: @vintage.id,
-          date: "2026-06-07",
-          setting: "Tasting room",
-          overall: "Good.",
-          buy: "0"
-        },
-        finish_action: "taste_another"
-      }
+    assert_no_difference("WatchListEntry.count") do
+      assert_difference("TastingNote.count", 1) do
+        post tasting_notes_url, params: {
+          tasting_note: {
+            tasteable_type: "Vintage",
+            tasteable_id: @vintage.id,
+            date: "2026-06-07",
+            setting: "Tasting room",
+            overall: "Good.",
+            buy: "0"
+          },
+          finish_action: "taste_another"
+        }
+      end
     end
 
     assert_redirected_to new_tasting_note_url(date: "2026-06-07", setting: "Tasting room")

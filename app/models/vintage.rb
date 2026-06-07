@@ -2,6 +2,7 @@ class Vintage < ApplicationRecord
   belongs_to :wine
   has_many :bottles, dependent: :restrict_with_error
   has_many :tasting_notes, as: :tasteable, dependent: :restrict_with_error
+  has_many :watch_list_entries, as: :watchable, dependent: :restrict_with_error
 
   validates :vintage, presence: true
 

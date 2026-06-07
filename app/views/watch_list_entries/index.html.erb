@@ -1,0 +1,15 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Watch List</h1>
+    <%= link_to "New watch list entry", new_watch_list_entry_path, class: "button button--primary" %>
+  </div>
+
+  <%= render "table", watch_list_entries: @watch_list_entries, deleted: false %>
+
+  <section class="watch-list-history">
+    <p class="empty-state">
+      <%= @deleted_watch_list_entries_count.positive? ? pluralize(@deleted_watch_list_entries_count, "previous watch list item") : "No previous watch list items." %>
+    </p>
+    <%= link_to "Old Items", old_entries_watch_list_entries_path, class: "button" %>
+  </section>
+</main>

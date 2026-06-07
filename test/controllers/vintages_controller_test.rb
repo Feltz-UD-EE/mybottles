@@ -17,6 +17,7 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "tbody tr:first-child td:first-child", "Producer"
     assert_select "tbody tr:first-child td:nth-child(2)", "Estate Red"
     assert_select "a[href=?]", vintage_path(Vintage.last), "2024"
+    assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: Vintage.last.id }), text: "Add to Watch List"
   end
 
   test "creates updates and deletes vintage" do
@@ -46,6 +47,7 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Producer - Estate Red - 2024"
+    assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: vintage.id }), text: "Add to Watch List"
     assert_select "dt", "Bottles purchased"
     assert_select "dd", "2"
     assert_select "h2", "Bottles Purchased"
