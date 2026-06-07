@@ -1,0 +1,50 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Wines</h1>
+    <%= link_to "New wine", new_wine_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="wine-search">Search wines</label>
+      <input id="wine-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="producer">Producer</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="name">Wine</button></th>
+            <th>Style</th>
+            <th>Color</th>
+            <th>Appellation</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @wines.each do |wine| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="producer"><%= link_to wine.producer.name, wine.producer %></td>
+              <td data-table-sort-value="name"><%= link_to wine.name, wine %></td>
+              <td><%= wine.style %></td>
+              <td><%= wine.color %></td>
+              <td><%= wine.appellation %></td>
+              <td class="actions">
+                <%= link_to "Edit", edit_wine_path(wine) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No wines yet." if @wines.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

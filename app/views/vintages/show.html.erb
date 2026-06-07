@@ -1,0 +1,54 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @vintage.wine.producer.name %> - <%= @vintage.wine.name %> - <%= @vintage.vintage %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_vintage_path(@vintage) %>
+      <%= link_to "Back to vintages", vintages_path %>
+      <%= button_to "Delete", @vintage, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this vintage?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Vintage</dt>
+    <dd><%= @vintage.vintage %></dd>
+    <dt>Wine</dt>
+    <dd><%= link_to @vintage.wine.name, @vintage.wine %></dd>
+    <dt>Producer</dt>
+    <dd><%= link_to @vintage.wine.producer.name, @vintage.wine.producer %></dd>
+    <dt>Grapes</dt>
+    <dd><%= simple_format(@vintage.grapes) %></dd>
+    <dt>Bottles purchased</dt>
+    <dd><%= @vintage.bottles.count %></dd>
+  </dl>
+
+  <section class="related-section">
+    <h2>Bottles Purchased</h2>
+
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Inventory</th>
+            <th>Purchase date</th>
+            <th>Source</th>
+            <th>List price</th>
+            <th>Discount price</th>
+            <th>On hand</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bottles.each do |bottle| %>
+            <tr>
+              <td><%= link_to bottle.personal_inventory, bottle %></td>
+              <td><%= bottle.purchase_date&.iso8601 %></td>
+              <td><%= bottle.purchase_source %></td>
+              <td><%= number_to_currency(bottle.list_price) if bottle.list_price.present? %></td>
+              <td><%= number_to_currency(bottle.discount_price) if bottle.discount_price.present? %></td>
+              <td><%= bottle.in_inventory? ? "Yes" : "No" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,46 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Producers</h1>
+    <%= link_to "New producer", new_producer_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="producer-search">Search producers</label>
+      <input id="producer-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="name">Name</button></th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Phone</th>
+            <th>Bottles on hand</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @producers.each do |producer| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="name"><%= link_to producer.name, producer %></td>
+              <td><%= producer.email %></td>
+              <td><%= link_to producer.website, producer.website if producer.website.present? %></td>
+              <td><%= producer.phone %></td>
+              <td><%= @producer_inventory_counts.fetch(producer.id, 0) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No producers yet." if @producers.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

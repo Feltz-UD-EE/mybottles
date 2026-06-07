@@ -1,0 +1,57 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Bottles</h1>
+    <%= link_to "New bottle", new_bottle_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="bottle-search">Search bottles</label>
+      <input id="bottle-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="inventory">Inventory</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="wine">Wine</button></th>
+            <th>Purchase Date</th>
+            <th>Source</th>
+            <th>List Price</th>
+            <th>Discount Price</th>
+            <th>In Inventory</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bottles.each do |bottle| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="inventory"><%= bottle.personal_inventory %></td>
+              <td data-table-sort-value="wine">
+                <%= link_to "#{bottle.vintage.wine.producer.name} - #{bottle.vintage.wine.name} - #{bottle.vintage.vintage}", bottle.vintage %>
+              </td>
+              <td><%= bottle.purchase_date&.iso8601 %></td>
+              <td><%= bottle.purchase_source %></td>
+              <td><%= number_to_currency(bottle.list_price) if bottle.list_price.present? %></td>
+              <td><%= number_to_currency(bottle.discount_price) if bottle.discount_price.present? %></td>
+              <td><%= bottle.in_inventory? ? "Yes" : "No" %></td>
+              <td class="actions">
+                <%= link_to "Show", bottle %>
+                <%= link_to "Edit", edit_bottle_path(bottle) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No bottles yet." if @bottles.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

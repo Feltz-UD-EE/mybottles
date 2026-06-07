@@ -25,6 +25,10 @@
     <%= render "shared/header" %>
 
     <div class="page-shell">
+      <% flash.each do |type, message| %>
+        <div class="flash flash--<%= type %>"><%= message %></div>
+      <% end %>
+
       <%= yield %>
     </div>
 

@@ -1,0 +1,48 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @producer.name %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_producer_path(@producer) %>
+      <%= link_to "Back to producers", producers_path %>
+      <%= button_to "Delete", @producer, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this producer?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Address</dt>
+    <dd><%= simple_format(@producer.address) %></dd>
+    <dt>Email</dt>
+    <dd><%= mail_to @producer.email if @producer.email.present? %></dd>
+    <dt>Website</dt>
+    <dd><%= link_to @producer.website, @producer.website if @producer.website.present? %></dd>
+    <dt>Phone</dt>
+    <dd><%= @producer.phone %></dd>
+  </dl>
+
+  <section class="related-section">
+    <h2>Wines</h2>
+
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Wine</th>
+            <th>Appellation</th>
+            <th>Style</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @wines.each do |wine| %>
+            <tr>
+              <td><%= link_to wine.name, wine %></td>
+              <td><%= wine.appellation %></td>
+              <td><%= wine.style %></td>
+              <td><%= wine.color %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

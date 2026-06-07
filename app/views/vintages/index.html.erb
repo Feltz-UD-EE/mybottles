@@ -1,0 +1,49 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Vintages</h1>
+    <%= link_to "New vintage", new_vintage_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="vintage-search">Search vintages</label>
+      <input id="vintage-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="producer">Producer</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="wine">Wine</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="vintage">Vintage</button></th>
+            <th>Grapes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @vintages.each do |vintage| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="producer"><%= link_to vintage.wine.producer.name, vintage.wine.producer %></td>
+              <td data-table-sort-value="wine"><%= link_to vintage.wine.name, vintage.wine %></td>
+              <td data-table-sort-value="vintage"><%= link_to vintage.vintage, vintage %></td>
+              <td><%= vintage.grapes %></td>
+              <td class="actions">
+                <%= link_to "Show", vintage %>
+                <%= link_to "Edit", edit_vintage_path(vintage) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No vintages yet." if @vintages.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>
