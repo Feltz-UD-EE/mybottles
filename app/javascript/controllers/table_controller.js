@@ -9,6 +9,10 @@ export default class extends Controller {
     sortDirection: { type: String, default: "asc" }
   }
 
+  connect() {
+    this.render()
+  }
+
   search() {
     this.pageValue = 1
     this.render()
@@ -47,6 +51,7 @@ export default class extends Controller {
 
     this.pageValue = Math.min(this.pageValue, pageCount)
     this.rowTargets.forEach((row) => row.hidden = true)
+    visibleRows.forEach((row) => row.parentElement.appendChild(row))
 
     visibleRows.slice(this.pageStart, this.pageStart + this.perPageValue).forEach((row) => {
       row.hidden = false

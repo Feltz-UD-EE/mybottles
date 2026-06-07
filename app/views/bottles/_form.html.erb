@@ -1,0 +1,52 @@
+<%= form_with(model: bottle, class: "resource-form") do |form| %>
+  <%= render "shared/errors", resource: bottle %>
+
+  <div class="field">
+    <%= form.label :vintage_id, "Vintage" %>
+    <%= form.collection_select :vintage_id, Vintage.includes(wine: :producer).order(:vintage), :id, :to_s, { prompt: "Select a vintage" }, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :purchase_date %>
+    <%= form.date_field :purchase_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :purchase_source %>
+    <%= form.text_field :purchase_source %>
+  </div>
+
+  <div class="field">
+    <%= form.label :list_price %>
+    <%= form.number_field :list_price, step: "0.01", min: "0" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :discount_price %>
+    <%= form.number_field :discount_price, step: "0.01", min: "0" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="field">
+    <%= form.label :disposal_date %>
+    <%= form.date_field :disposal_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :disposal_method %>
+    <%= form.select :disposal_method, options_for_select(Bottle::DISPOSAL_METHODS, bottle.disposal_method), { include_blank: true } %>
+  </div>
+
+  <div class="field">
+    <%= form.label :personal_inventory, "Personal inventory code" %>
+    <%= form.text_field :personal_inventory %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit %>
+  </div>
+<% end %>

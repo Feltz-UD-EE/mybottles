@@ -1,0 +1,37 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @producer.name %> - <%= @wine.name %> - <%= @vintage.vintage %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_bottle_path(@bottle) %>
+      <%= link_to "Back to bottles", bottles_path %>
+      <%= button_to "Delete", @bottle, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this bottle?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Personal inventory</dt>
+    <dd><%= @bottle.personal_inventory %></dd>
+    <dt>Producer</dt>
+    <dd><%= link_to @producer.name, @producer %></dd>
+    <dt>Wine</dt>
+    <dd><%= link_to @wine.name, @wine %></dd>
+    <dt>Vintage</dt>
+    <dd><%= link_to @vintage.vintage, @vintage %></dd>
+    <dt>Purchase date</dt>
+    <dd><%= @bottle.purchase_date&.iso8601 %></dd>
+    <dt>Purchase source</dt>
+    <dd><%= @bottle.purchase_source %></dd>
+    <dt>List price</dt>
+    <dd><%= number_to_currency(@bottle.list_price) if @bottle.list_price.present? %></dd>
+    <dt>Discount price</dt>
+    <dd><%= number_to_currency(@bottle.discount_price) if @bottle.discount_price.present? %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@bottle.notes) %></dd>
+    <dt>Disposal date</dt>
+    <dd><%= @bottle.disposal_date&.iso8601 %></dd>
+    <dt>Disposal method</dt>
+    <dd><%= @bottle.disposal_method %></dd>
+    <dt>In inventory</dt>
+    <dd><%= @bottle.in_inventory? ? "Yes" : "No" %></dd>
+  </dl>
+</main>

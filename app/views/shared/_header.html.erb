@@ -20,6 +20,15 @@
             <li><a class="primary-menu__link primary-menu__link--placeholder" href="#" aria-disabled="true" data-action="click->menu#ignorePlaceholder">Cellar Overview</a></li>
           </ul>
         </li>
+        <li class="primary-menu__item primary-menu__item--has-children">
+          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Data</a>
+          <ul class="primary-menu__submenu" aria-label="Data submenu">
+            <li><%= link_to "Producers", producers_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Wines", wines_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Vintages", vintages_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Bottles", bottles_path, class: "primary-menu__link" %></li>
+          </ul>
+        </li>
       </ul>
 
       <button class="theme-toggle" type="button" data-action="theme#toggle" data-theme-target="button" aria-pressed="false">
