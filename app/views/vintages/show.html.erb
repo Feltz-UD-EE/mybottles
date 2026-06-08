@@ -51,5 +51,9 @@
         </tbody>
       </table>
     </div>
+
+    <div class="related-actions">
+      <%= link_to "New Bottle", new_bottle_path(bottle: { vintage_id: @vintage.id }), class: "button button--primary" %>
+    </div>
   </section>
 </main>

@@ -44,5 +44,9 @@
         </tbody>
       </table>
     </div>
+
+    <div class="related-actions">
+      <%= link_to "New Wine", new_wine_path(wine: { producer_id: @producer.id }), class: "button button--primary" %>
+    </div>
   </section>
 </main>

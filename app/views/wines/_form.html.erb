@@ -2,16 +2,6 @@
   <%= render "shared/errors", resource: wine %>
 
   <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name, required: true %>
-  </div>
-
-  <div class="field">
-    <%= form.label :description %>
-    <%= form.text_area :description %>
-  </div>
-
-  <div class="field">
     <%= form.label :producer_id, "Producer" %>
     <% if wine.persisted? %>
       <p><%= link_to wine.producer.name, wine.producer %></p>
@@ -19,6 +9,16 @@
     <% else %>
       <%= form.collection_select :producer_id, Producer.order(:name), :id, :name, { prompt: "Select a producer" }, required: true %>
     <% end %>
+  </div>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_area :description %>
   </div>
 
   <div class="field">

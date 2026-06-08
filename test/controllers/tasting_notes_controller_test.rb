@@ -5,7 +5,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     @producer = Producer.create!(name: "Producer")
     @wine = Wine.create!(name: "Estate Red", producer: @producer)
     @vintage = Vintage.create!(vintage: "2024", wine: @wine)
-    @bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage)
+    @bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, list_price: "24.99")
   end
 
   test "lists tasting notes with dynamic table UI" do
@@ -24,7 +24,14 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h2", "Bottle"
+    assert_select ".form-panel p", "List price: $24.99"
     assert_select "input[name='tasting_note[tasteable_id]'][value=?]", @bottle.id
+    assert_select "select[name='tasting_note[buy]']", count: 0
+    assert_select "input[name='tasting_note[buy_yes]'][type='checkbox']"
+    assert_select "input[name='tasting_note[buy_no]'][type='checkbox']"
+    assert_select ".form-actions button", 1
+    assert_select ".form-actions button", "Save"
+    assert_select ".form-actions button", text: "Taste Another", count: 0
 
     assert_difference("TastingNote.count", 1) do
       assert_difference("WatchListEntry.count", 1) do
@@ -35,7 +42,8 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
             date: "2026-06-07",
             setting: "Home",
             overall: "Very nice.",
-            buy: "1"
+            buy_yes: "1",
+            buy_no: "0"
           },
           finish_action: "done"
         }
@@ -75,6 +83,27 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to new_tasting_note_url(date: "2026-06-07", setting: "Tasting room")
+  end
+
+  test "does not create tasting note when buy yes and no are both checked" do
+    assert_no_difference("TastingNote.count") do
+      post tasting_notes_url, params: {
+        tasting_note: {
+          tasteable_type: "Vintage",
+          tasteable_id: @vintage.id,
+          date: "2026-06-07",
+          overall: "Conflicted.",
+          buy_yes: "1",
+          buy_no: "1"
+        },
+        finish_action: "done"
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-messages", text: /Buy cannot be both Yes and No/
+    assert_select "input[name='tasting_note[buy_yes]'][checked]"
+    assert_select "input[name='tasting_note[buy_no]'][checked]"
   end
 
   test "creates producer wine vintage and tasting note inline" do

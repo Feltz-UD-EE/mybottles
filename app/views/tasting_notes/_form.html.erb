@@ -5,6 +5,9 @@
     <section class="form-panel">
       <h2>Bottle</h2>
       <p><%= link_to tasting_note.tasteable_name, tasting_note.tasteable %></p>
+      <% if tasting_note.tasteable.list_price.present? %>
+        <p>List price: <%= number_to_currency(tasting_note.tasteable.list_price) %></p>
+      <% end %>
       <%= hidden_field_tag "tasting_note[tasteable_type]", "Bottle" %>
       <%= hidden_field_tag "tasting_note[tasteable_id]", tasting_note.tasteable.id %>
     </section>
@@ -105,12 +108,25 @@
   </div>
 
   <div class="field">
-    <%= form.label :buy %>
-    <%= form.select :buy, [["", nil], ["Yes", true], ["No", false]] %>
+    <span class="field-label">Buy</span>
+    <div class="buy-choice-group">
+      <label class="buy-choice buy-choice--yes">
+        <%= form.check_box :buy_yes, { checked: tasting_note.buy_yes_selected? }, "1", "0" %>
+        <span>Yes</span>
+      </label>
+      <label class="buy-choice buy-choice--no">
+        <%= form.check_box :buy_no, { checked: tasting_note.buy_no_selected? }, "1", "0" %>
+        <span>No</span>
+      </label>
+    </div>
   </div>
 
   <div class="form-actions">
-    <button class="button button--primary" type="submit" name="finish_action" value="done">Done Tasting</button>
-    <button class="button" type="submit" name="finish_action" value="taste_another">Taste Another</button>
+    <% if tasting_note.tasteable.is_a?(Bottle) %>
+      <button class="button button--primary" type="submit" name="finish_action" value="done">Save</button>
+    <% else %>
+      <button class="button button--primary" type="submit" name="finish_action" value="done">Done Tasting</button>
+      <button class="button" type="submit" name="finish_action" value="taste_another">Taste Another</button>
+    <% end %>
   </div>
 <% end %>

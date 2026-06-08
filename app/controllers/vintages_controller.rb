@@ -10,7 +10,7 @@ class VintagesController < ApplicationController
   end
 
   def new
-    @vintage = Vintage.new
+    @vintage = Vintage.new(params[:vintage]&.permit(:wine_id) || {})
   end
 
   def edit

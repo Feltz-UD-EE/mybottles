@@ -36,6 +36,15 @@ class WinesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "new preloads producer from params" do
+    get new_wine_url(wine: { producer_id: @producer.id })
+
+    assert_response :success
+    assert_select ".resource-form .field:first-child label", "Producer"
+    assert_select "select[name='wine[producer_id]'] option[selected][value=?]", @producer.id
+    assert_select "select[name='wine[style]'] option[selected][value='Still']", "Still"
+  end
+
   test "show displays bottle purchase counts by vintage" do
     wine = Wine.create!(name: "Estate Red", producer: @producer)
     vintage_2023 = Vintage.create!(vintage: "2023", wine: wine)
@@ -49,6 +58,7 @@ class WinesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Producer - Estate Red"
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Wine", watchable_id: wine.id }), text: "Add to Watch List"
+    assert_select "a[href=?]", new_vintage_path(vintage: { wine_id: wine.id }), text: "New Vintage"
     assert_select "h2", "Bottles Purchased by Vintage"
     assert_select "tr", text: /2023\s+1\s+1/
     assert_select "tr", text: /2024\s+3\s+2/
