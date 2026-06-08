@@ -8,7 +8,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "title", "My Bottles"
     assert_select "h1", "Welcome to My Bottles!"
     assert_select "header .site-logo[href=?]", root_path
-    assert_select "nav[aria-label='Main menu']", text: /My Cellars/
+    assert_select "nav[aria-label='Main menu']", text: /Cellars/
+    assert_select "a[href=?]", cellars_path, text: "Cellars"
     assert_select "button[data-action='theme#toggle']", text: /Dark mode/
     assert_select "footer a[href=?]", about_path, text: "About"
     assert_select "footer a[href=?]", legal_path, text: "Legal"

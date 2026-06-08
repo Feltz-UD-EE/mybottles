@@ -1,0 +1,32 @@
+<%= form_with(model: shelf, class: "resource-form") do |form| %>
+  <%= render "shared/errors", resource: shelf %>
+
+  <div class="field">
+    <%= form.label :shelveable_selection, "Parent" %>
+    <%= form.select :shelveable_selection, options_for_select(@shelveable_options, shelf.shelveable_selection), { prompt: "Select a cellar or bay" }, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :number %>
+    <%= form.text_field :number %>
+  </div>
+
+  <div class="field">
+    <%= form.label :label %>
+    <%= form.text_field :label %>
+  </div>
+
+  <div class="field">
+    <%= form.label :depth %>
+    <%= form.select :depth, options_for_select(Shelf::DEPTHS, shelf.depth || "Single") %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>

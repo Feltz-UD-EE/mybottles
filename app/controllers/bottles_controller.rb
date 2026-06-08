@@ -1,5 +1,6 @@
 class BottlesController < ApplicationController
   before_action :set_bottle, only: %i[ show edit update destroy ]
+  before_action :load_cellarable_options, only: %i[ new edit create update ]
 
   def index
     @bottles = Bottle.includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
@@ -19,9 +20,11 @@ class BottlesController < ApplicationController
   end
 
   def create
-    @bottle = Bottle.new(bottle_params)
+    attributes = bottle_params
+    selection = attributes.delete(:cellarable_selection)
+    @bottle = Bottle.new(attributes)
 
-    if @bottle.save
+    if apply_cellarable_selection(@bottle, selection) && @bottle.save
       redirect_to @bottle, notice: "Bottle was successfully created."
     else
       render :new, status: :unprocessable_entity
@@ -29,7 +32,11 @@ class BottlesController < ApplicationController
   end
 
   def update
-    if @bottle.update(bottle_params)
+    attributes = bottle_params
+    selection = attributes.delete(:cellarable_selection)
+    valid_selection = apply_cellarable_selection(@bottle, selection)
+
+    if valid_selection && @bottle.update(attributes)
       redirect_to @bottle, notice: "Bottle was successfully updated."
     else
       render :edit, status: :unprocessable_entity
@@ -51,6 +58,34 @@ class BottlesController < ApplicationController
   end
 
   def bottle_params
-    params.expect(bottle: %i[ personal_inventory vintage_id purchase_date purchase_source list_price discount_price notes disposal_date disposal_method ])
+    params.expect(bottle: %i[ personal_inventory vintage_id purchase_date purchase_source list_price discount_price notes disposal_date disposal_method cellarable_selection ])
+  end
+
+  def load_cellarable_options
+    @cellarable_options = [ [ "Not Cellared", "" ] ] +
+      Cellar.order(:name).map { |cellar| [ cellar.name, "Cellar:#{cellar.id}" ] } +
+      Bin.includes(:cellar).sort_by(&:display_name).map { |bin| [ bin.display_name, "Bin:#{bin.id}" ] } +
+      Shelf.all.sort_by(&:location_name).map { |shelf| [ shelf.location_name, "Shelf:#{shelf.id}" ] }
+  end
+
+  def apply_cellarable_selection(bottle, selection)
+    return true if selection.nil?
+
+    if selection.blank?
+      bottle.cellarable = nil
+      return true
+    end
+
+    type, id = selection.split(":", 2)
+    unless %w[Cellar Bin Shelf].include?(type) && id.present?
+      bottle.errors.add(:cellarable, "is invalid")
+      return false
+    end
+
+    bottle.cellarable = type.constantize.find(id)
+    true
+  rescue ActiveRecord::RecordNotFound
+    bottle.errors.add(:cellarable, "is invalid")
+    false
   end
 end

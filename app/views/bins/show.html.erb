@@ -1,0 +1,23 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @bin.display_name %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_bin_path(@bin) %>
+      <%= link_to "Back to bins", bins_path %>
+      <%= button_to "Delete", @bin, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this bin?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Cellar</dt>
+    <dd><%= link_to @bin.cellar.name, @bin.cellar %></dd>
+    <dt>Label</dt>
+    <dd><%= @bin.label %></dd>
+    <dt>Location</dt>
+    <dd><%= @bin.location %></dd>
+    <dt>Bottles stored</dt>
+    <dd><%= @bin.current_bottle_count %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@bin.notes) %></dd>
+  </dl>
+</main>

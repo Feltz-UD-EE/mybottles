@@ -10,10 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_07_133000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_08_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "bays", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "A bay is a section of a cellar. Bays are composed of racks of shelves.", force: :cascade do |t|
+    t.uuid "cellar_id", null: false, comment: "What cellar the bay is located in"
+    t.text "label", comment: "The nametag or other label applied to the bay"
+    t.text "location", comment: "Where the bay is located within the cellar"
+    t.text "notes", comment: "Any other descriptive information about the bay"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cellar_id"], name: "index_bays_on_cellar_id"
+  end
+
+  create_table "bins", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "A bin is a large, unstructured storage element within a cellar. A bin is typically, though not always, used to store multiple bottles of the same vintage.", force: :cascade do |t|
+    t.uuid "cellar_id", null: false, comment: "What cellar the bin is located in"
+    t.text "label", comment: "The nametag or other label applied to the bin"
+    t.text "location", comment: "Where the bin is located within the cellar"
+    t.text "notes", comment: "Any other descriptive information about the bin"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cellar_id"], name: "index_bins_on_cellar_id"
+  end
 
   create_table "bottles", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Bottles are individual units of sales of a wine. People purchase and store bottles, often times multiple bottles of a given vintage.", force: :cascade do |t|
     t.text "personal_inventory", comment: "An individual numbering code, often for legacy purposes"
@@ -27,9 +47,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_133000) do
     t.text "disposal_method", comment: "The way in which the bottle was disposed: drink, gift, sale, or spoiled"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "cellarable_type"
+    t.uuid "cellarable_id", comment: "Where this bottle is cellared"
+    t.index ["cellarable_type", "cellarable_id"], name: "index_bottles_on_cellarable"
     t.index ["vintage_id"], name: "index_bottles_on_vintage_id"
+    t.check_constraint "cellarable_type IS NULL OR (cellarable_type::text = ANY (ARRAY['Cellar'::character varying, 'Bin'::character varying, 'Shelf'::character varying]::text[]))", name: "chk_bottles_cellarable_type"
     t.check_constraint "disposal_method IS NULL OR (disposal_method = ANY (ARRAY['Drink'::text, 'Gift'::text, 'Sale'::text, 'Spoiled'::text]))", name: "chk_bottles_disposal_method"
     t.check_constraint "purchase_date IS NULL OR disposal_date IS NULL OR disposal_date >= purchase_date", name: "chk_bottles_disposal_date_after_purchase_date"
+  end
+
+  create_table "cellars", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Cellars are places to store wine. A user may have one or more cellars. Cellars have a variety of sub-elements - bays, bins, shelves. \"Cellar\" is also a way to describe other kinds of storage systems and locations, such as wine refrigerators.", force: :cascade do |t|
+    t.text "name", null: false, comment: "A convenient name for a cellar"
+    t.text "location", comment: "Where the cellar is located"
+    t.text "notes", comment: "Any other descriptive information about the cellar"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "producers", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Producers are individual, co-ops, corporations, and other entities that make wine. They may or may not own land with grapes. They may use their own grapes, purchased grapes, or a combination of the two. Producers typically, though not always, make more than one wine.", force: :cascade do |t|
@@ -42,6 +74,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_133000) do
     t.datetime "updated_at", null: false
     t.check_constraint "email IS NULL OR email = ''::text OR email ~* '^[^@[:space:]]+@[^@[:space:]]+[.][^@[:space:]]+$'::text", name: "chk_producers_email_format"
     t.check_constraint "website IS NULL OR website = ''::text OR website ~* '^https?://[^[:space:]]+$'::text", name: "chk_producers_website_http_url"
+  end
+
+  create_table "shelves", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "A shelf is a horizontal surface or rack suitable for placing bottles. Shelves often have small separators so that bottles are not touching each other and can be drawn out easily. Shelves may be one bottle deep or sometimes multiple bottles deep.", force: :cascade do |t|
+    t.string "shelveable_type", null: false, comment: "Whether this shelf belongs to a cellar or a bay"
+    t.uuid "shelveable_id", null: false, comment: "The cellar or bay this shelf belongs to"
+    t.text "number", comment: "A numeric or semi-numeric label for the shelf for sorting purposes"
+    t.text "label", comment: "Any label that might be applied to a shelf; this may change over time"
+    t.text "depth", default: "Single", null: false, comment: "Whether the shelf is a single bottle deep or multiple"
+    t.text "notes", comment: "Any other descriptive information about the shelf"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shelveable_type", "shelveable_id"], name: "index_shelves_on_shelveable_type_and_shelveable_id"
+    t.check_constraint "depth = ANY (ARRAY['Single'::text, 'Multiple'::text])", name: "chk_shelves_depth"
+    t.check_constraint "shelveable_type::text = ANY (ARRAY['Cellar'::character varying, 'Bay'::character varying]::text[])", name: "chk_shelves_shelveable_type"
   end
 
   create_table "tasting_notes", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Tasting Notes are personal notes about tasting wine - from a particular bottle, or from a representative wine & vintage at a winery or retailer.", force: :cascade do |t|
@@ -117,6 +163,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_133000) do
     t.check_constraint "style IS NULL OR (style = ANY (ARRAY['Still'::text, 'Sparkling'::text, 'Fortified'::text, 'Flavored'::text]))", name: "chk_wines_style"
   end
 
+  add_foreign_key "bays", "cellars", on_delete: :restrict
+  add_foreign_key "bins", "cellars", on_delete: :restrict
   add_foreign_key "bottles", "vintages", on_delete: :restrict
   add_foreign_key "vintages", "wines", on_delete: :restrict
   add_foreign_key "wine_clubs", "producers", on_delete: :restrict

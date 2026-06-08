@@ -1,0 +1,96 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @cellar.name %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_cellar_path(@cellar) %>
+      <%= link_to "Back to cellars", cellars_path %>
+      <%= button_to "Delete", @cellar, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this cellar?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Location</dt>
+    <dd><%= @cellar.location %></dd>
+    <dt>Bottles stored</dt>
+    <dd><%= @cellar.current_bottle_count %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@cellar.notes) %></dd>
+  </dl>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Bins</h2>
+      <%= link_to "New Bin", new_bin_path(bin: { cellar_id: @cellar.id }), class: "button button--primary" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Bottles stored</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bins.each do |bin| %>
+            <tr>
+              <td><%= link_to bin.label, bin %></td>
+              <td><%= bin.current_bottle_count %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Bays</h2>
+      <%= link_to "New Bay", new_bay_path(bay: { cellar_id: @cellar.id }), class: "button button--primary" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Bottles stored</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bays.each do |bay| %>
+            <tr>
+              <td><%= link_to bay.label, bay %></td>
+              <td><%= bay.current_bottle_count %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Shelves</h2>
+      <%= link_to "New Shelf", new_shelf_path(shelf: { shelveable_type: "Cellar", shelveable_id: @cellar.id }), class: "button button--primary" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Label</th>
+            <th>Bottles stored</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @shelves.each do |shelf| %>
+            <tr>
+              <td><%= link_to shelf.number, shelf %></td>
+              <td><%= shelf.label %></td>
+              <td><%= shelf.current_bottle_count %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

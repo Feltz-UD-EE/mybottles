@@ -1,0 +1,46 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Bays</h1>
+    <%= link_to "New bay", new_bay_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="bay-search">Search bays</label>
+      <input id="bay-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="cellar">Cellar</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="label">Label</button></th>
+            <th>Location</th>
+            <th>Bottles stored</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bays.each do |bay| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="cellar"><%= link_to bay.cellar.name, bay.cellar %></td>
+              <td data-table-sort-value="label"><%= link_to bay.label, bay %></td>
+              <td><%= bay.location %></td>
+              <td><%= bay.current_bottle_count %></td>
+              <td class="actions"><%= link_to "Edit", edit_bay_path(bay) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No bays yet." if @bays.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

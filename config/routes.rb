@@ -10,6 +10,10 @@ Rails.application.routes.draw do
   resources :wines
   resources :vintages
   resources :bottles
+  resources :cellars
+  resources :bins
+  resources :bays
+  resources :shelves
   resources :tasting_notes
   resources :wine_clubs do
     get :all, on: :collection

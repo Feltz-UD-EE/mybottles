@@ -1,0 +1,22 @@
+<%= form_with(model: cellar, class: "resource-form") do |form| %>
+  <%= render "shared/errors", resource: cellar %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :location %>
+    <%= form.text_field :location %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>

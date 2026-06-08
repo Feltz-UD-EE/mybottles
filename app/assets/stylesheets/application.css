@@ -540,8 +540,16 @@ a {
 }
 
 .related-section h2 {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 1.25rem;
+}
+
+.related-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .related-actions {

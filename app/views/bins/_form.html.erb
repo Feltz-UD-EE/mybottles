@@ -1,0 +1,27 @@
+<%= form_with(model: bin, class: "resource-form") do |form| %>
+  <%= render "shared/errors", resource: bin %>
+
+  <div class="field">
+    <%= form.label :cellar_id, "Cellar" %>
+    <%= form.collection_select :cellar_id, Cellar.order(:name), :id, :name, { prompt: "Select a cellar" }, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :label %>
+    <%= form.text_field :label %>
+  </div>
+
+  <div class="field">
+    <%= form.label :location %>
+    <%= form.text_field :location %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>

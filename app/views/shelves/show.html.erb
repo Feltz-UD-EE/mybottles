@@ -1,0 +1,25 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @shelf.location_name %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_shelf_path(@shelf) %>
+      <%= link_to "Back to shelves", shelves_path %>
+      <%= button_to "Delete", @shelf, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this shelf?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Parent</dt>
+    <dd><%= link_to @shelf.shelveable.display_name, @shelf.shelveable %></dd>
+    <dt>Number</dt>
+    <dd><%= @shelf.number %></dd>
+    <dt>Label</dt>
+    <dd><%= @shelf.label %></dd>
+    <dt>Depth</dt>
+    <dd><%= @shelf.depth %></dd>
+    <dt>Bottles stored</dt>
+    <dd><%= @shelf.current_bottle_count %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@shelf.notes) %></dd>
+  </dl>
+</main>

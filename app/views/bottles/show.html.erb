@@ -23,6 +23,8 @@
     <dd><%= @bottle.purchase_date&.iso8601 %></dd>
     <dt>Purchase source</dt>
     <dd><%= @bottle.purchase_source %></dd>
+    <dt>Location</dt>
+    <dd><%= @bottle.location_name %></dd>
     <dt>List price</dt>
     <dd><%= number_to_currency(@bottle.list_price) if @bottle.list_price.present? %></dd>
     <dt>Discount price</dt>

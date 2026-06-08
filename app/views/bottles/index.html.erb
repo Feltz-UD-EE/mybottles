@@ -18,6 +18,7 @@
             <th><button type="button" data-action="table#sort" data-table-column="wine">Wine</button></th>
             <th>Purchase Date</th>
             <th>Source</th>
+            <th>Location</th>
             <th>List Price</th>
             <th>Discount Price</th>
             <th>In Inventory</th>
@@ -33,6 +34,7 @@
               </td>
               <td><%= bottle.purchase_date&.iso8601 %></td>
               <td><%= bottle.purchase_source %></td>
+              <td><%= bottle.location_name %></td>
               <td><%= number_to_currency(bottle.list_price) if bottle.list_price.present? %></td>
               <td><%= number_to_currency(bottle.discount_price) if bottle.discount_price.present? %></td>
               <td><%= bottle.in_inventory? ? "Yes" : "No" %></td>

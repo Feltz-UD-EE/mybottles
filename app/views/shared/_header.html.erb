@@ -15,9 +15,12 @@
     <nav id="primary-menu" class="primary-menu" data-menu-target="panel" aria-label="Main menu">
       <ul class="primary-menu__list">
         <li class="primary-menu__item primary-menu__item--has-children">
-          <a class="primary-menu__link primary-menu__link--placeholder" href="#" aria-disabled="true" data-action="click->menu#ignorePlaceholder">My Cellars</a>
-          <ul class="primary-menu__submenu" aria-label="My Cellars submenu">
-            <li><a class="primary-menu__link primary-menu__link--placeholder" href="#" aria-disabled="true" data-action="click->menu#ignorePlaceholder">Cellar Overview</a></li>
+          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Cellars</a>
+          <ul class="primary-menu__submenu" aria-label="Cellars submenu">
+            <li><%= link_to "Cellars", cellars_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Bins", bins_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Bays", bays_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Shelves", shelves_path, class: "primary-menu__link" %></li>
           </ul>
         </li>
         <li class="primary-menu__item"><%= link_to "Watch List", watch_list_entries_path, class: "primary-menu__link" %></li>
