@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   resources :producers
   resources :wines
   resources :vintages
-  resources :bottles
+  resources :bottles do
+    get :label, on: :member
+  end
   resources :cellars
   resources :bins
   resources :bays

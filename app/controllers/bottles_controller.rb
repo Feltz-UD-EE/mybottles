@@ -1,5 +1,5 @@
 class BottlesController < ApplicationController
-  before_action :set_bottle, only: %i[ show edit update destroy ]
+  before_action :set_bottle, only: %i[ show label edit update destroy ]
   before_action :load_cellarable_options, only: %i[ new edit create update ]
 
   def index
@@ -10,6 +10,23 @@ class BottlesController < ApplicationController
     @vintage = @bottle.vintage
     @wine = @vintage.wine
     @producer = @wine.producer
+  end
+
+  def label
+    @vintage = @bottle.vintage
+    @wine = @vintage.wine
+    @producer = @wine.producer
+    @label_app_name = Rails.configuration.x.label_printing.app_name
+    @label_url = bottle_label_url(@bottle)
+    @qr_svg = RQRCode::QRCode.new(@label_url, size: 4, level: :l).as_svg(
+      color: "000",
+      fill: "fff",
+      module_size: 4,
+      shape_rendering: "crispEdges",
+      standalone: true,
+      viewbox: true,
+      use_path: true
+    )
   end
 
   def new
@@ -25,7 +42,7 @@ class BottlesController < ApplicationController
     @bottle = Bottle.new(attributes)
 
     if apply_cellarable_selection(@bottle, selection) && @bottle.save
-      redirect_to @bottle, notice: "Bottle was successfully created."
+      redirect_to bottle_url(@bottle, print_label: true), notice: "Bottle was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -55,6 +72,10 @@ class BottlesController < ApplicationController
 
   def set_bottle
     @bottle = Bottle.find(params.expect(:id))
+  end
+
+  def bottle_label_url(bottle)
+    URI.join(Rails.configuration.x.label_printing.base_url, bottle_path(bottle)).to_s
   end
 
   def bottle_params

@@ -10,6 +10,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "header .site-logo[href=?]", root_path
     assert_select "nav[aria-label='Main menu']", text: /Cellars/
     assert_select "a[href=?]", cellars_path, text: "Cellars"
+    assert_select "button[data-controller='label-printing']", text: /Print labels/
     assert_select "button[data-action='theme#toggle']", text: /Dark mode/
     assert_select "footer a[href=?]", about_path, text: "About"
     assert_select "footer a[href=?]", legal_path, text: "Legal"

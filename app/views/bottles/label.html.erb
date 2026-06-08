@@ -1,0 +1,16 @@
+<% content_for :title, "#{@label_app_name} Label" %>
+
+<main class="print-label-page" data-controller="print-page">
+  <section class="bottle-label" aria-label="Bottle label">
+    <div class="bottle-label__brand">
+      <%= image_tag "my_bottles_mark.svg", class: "bottle-label__mark", alt: "" %>
+      <span><%= @label_app_name %></span>
+    </div>
+
+    <div class="bottle-label__qr"><%= raw @qr_svg %></div>
+
+    <% if @bottle.personal_inventory.present? %>
+      <div class="bottle-label__inventory"><%= @bottle.personal_inventory %></div>
+    <% end %>
+  </section>
+</main>

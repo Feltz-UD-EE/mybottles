@@ -38,8 +38,32 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Producer - Estate Red - 2024"
     assert_select "dt", "Location"
     assert_select "dd", "Main"
+    assert_select "a[href=?]", label_bottle_path(bottle), text: "Print labels"
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
+  end
+
+  test "show auto print hook is present when redirected after create" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+
+    get bottle_url(bottle, print_label: true)
+
+    assert_response :success
+    assert_select "[data-controller='print-label'][data-print-label-enabled-value='true'][data-print-label-url-value=?]", label_bottle_path(bottle)
+  end
+
+  test "label renders qr code and label content" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+
+    get label_bottle_url(bottle)
+
+    assert_response :success
+    assert_select "[data-controller='print-page']"
+    assert_select ".bottle-label__brand", text: /My Bottles/
+    assert_select ".bottle-label__inventory", "A-001"
+    assert_includes response.body, "bottle-label__qr"
+    assert_includes response.body, "<svg"
+    assert_includes response.body, "viewBox="
   end
 
   test "new preloads vintage from params" do
@@ -68,7 +92,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     end
 
     bottle = Bottle.order(:created_at).last
-    assert_redirected_to bottle_url(bottle)
+    assert_redirected_to bottle_url(bottle, print_label: true)
     assert_equal cellar, bottle.cellarable
 
     patch bottle_url(bottle), params: { bottle: { personal_inventory: "A-003", vintage_id: @vintage.id, discount_price: "20.00", disposal_method: "Gift", disposal_date: "2026-06-07", cellarable_selection: "Bin:#{bin.id}" } }

@@ -592,3 +592,80 @@ a {
     box-shadow: none;
   }
 }
+
+.print-label-page {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+}
+
+.bottle-label {
+  width: 2.4in;
+  min-height: 1.1in;
+  display: grid;
+  grid-template-columns: 0.68in 1fr;
+  gap: 0.12in;
+  align-items: center;
+  padding: 0.1in;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: #000;
+}
+
+.bottle-label__brand {
+  display: grid;
+  justify-items: center;
+  gap: 0.04in;
+  font-size: 8pt;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.bottle-label__mark {
+  width: 0.34in;
+  height: 0.34in;
+  filter: grayscale(1) contrast(2);
+}
+
+.bottle-label__qr svg {
+  width: 0.68in;
+  height: 0.68in;
+  display: block;
+}
+
+.bottle-label__inventory {
+  grid-column: 1 / -1;
+  font-size: 10pt;
+  font-weight: 700;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 0;
+  }
+
+  .site-header,
+  .site-footer,
+  .flash {
+    display: none;
+  }
+
+  body,
+  .page-shell,
+  .print-label-page {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    display: block;
+    background: #fff;
+  }
+
+  .bottle-label {
+    border: 0;
+  }
+}

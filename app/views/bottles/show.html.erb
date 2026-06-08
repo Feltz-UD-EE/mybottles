@@ -1,7 +1,8 @@
-<main class="page-section">
+<main class="page-section" data-controller="print-label" data-print-label-enabled-value="<%= params[:print_label].present? %>" data-print-label-url-value="<%= label_bottle_path(@bottle) %>">
   <div class="page-header">
     <h1><%= @producer.name %> - <%= @wine.name %> - <%= @vintage.vintage %></h1>
     <div class="actions">
+      <%= link_to "Print labels", label_bottle_path(@bottle), class: "button button--primary", target: "_blank", rel: "noopener" %>
       <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), class: "button button--primary" %>
       <%= link_to "Tasted This", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: @bottle.id }), class: "button button--primary" %>
       <%= link_to "Edit", edit_bottle_path(@bottle) %>
