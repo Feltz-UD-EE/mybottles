@@ -10,7 +10,7 @@ class WinesController < ApplicationController
   end
 
   def new
-    @wine = Wine.new
+    @wine = Wine.new({ style: "Still" }.merge(params[:wine]&.permit(:producer_id, :style) || {}))
   end
 
   def edit

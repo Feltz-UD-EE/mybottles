@@ -2,13 +2,13 @@
   <%= render "shared/errors", resource: vintage %>
 
   <div class="field">
-    <%= form.label :vintage %>
-    <%= form.text_field :vintage, required: true, placeholder: "(year, batch, or NV)" %>
+    <%= form.label :wine_id, "Wine" %>
+    <%= form.collection_select :wine_id, Wine.includes(:producer).sort_by(&:display_name), :id, :display_name, { prompt: "Select a wine" }, required: true %>
   </div>
 
   <div class="field">
-    <%= form.label :wine_id, "Wine" %>
-    <%= form.collection_select :wine_id, Wine.includes(:producer).order(:name), :id, :to_s, { prompt: "Select a wine" }, required: true %>
+    <%= form.label :vintage %>
+    <%= form.text_field :vintage, required: true, placeholder: "(year, batch, or NV)" %>
   </div>
 
   <div class="field">

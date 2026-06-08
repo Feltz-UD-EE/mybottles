@@ -38,6 +38,15 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to vintages_url
   end
 
+  test "new preloads wine from params" do
+    get new_vintage_url(vintage: { wine_id: @wine.id })
+
+    assert_response :success
+    assert_select ".resource-form .field:first-child label", "Wine"
+    assert_select "select[name='vintage[wine_id]'] option[selected][value=?]", @wine.id
+    assert_select "select[name='vintage[wine_id]'] option", "Producer - Estate Red"
+  end
+
   test "show displays bottle purchase count" do
     vintage = Vintage.create!(vintage: "2024", wine: @wine)
     bottle = Bottle.create!(personal_inventory: "A-001", vintage: vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink")
@@ -52,5 +61,6 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "dd", "2"
     assert_select "h2", "Bottles Purchased"
     assert_select "a[href=?]", bottle_path(bottle), "A-001"
+    assert_select "a[href=?]", new_bottle_path(bottle: { vintage_id: vintage.id }), text: "New Bottle"
   end
 end

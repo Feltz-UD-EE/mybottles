@@ -2,7 +2,7 @@ class BottlesController < ApplicationController
   before_action :set_bottle, only: %i[ show edit update destroy ]
 
   def index
-    @bottles = Bottle.includes(vintage: { wine: :producer }).order(created_at: :desc)
+    @bottles = Bottle.includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
   end
 
   def show
@@ -12,7 +12,7 @@ class BottlesController < ApplicationController
   end
 
   def new
-    @bottle = Bottle.new
+    @bottle = Bottle.new(params[:bottle]&.permit(:vintage_id) || {})
   end
 
   def edit

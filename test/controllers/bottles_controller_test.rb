@@ -9,6 +9,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
 
   test "lists bottles with dynamic table UI" do
     bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink")
+    newer_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage, purchase_date: Date.new(2026, 6, 7), disposal_method: "Drink")
 
     get bottles_url
 
@@ -18,8 +19,10 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", "A-001"
     assert_select "td", "Producer - Estate Red - 2024"
     assert_select "td", "2026-06-06"
+    assert_select "tbody tr:first-child td:first-child", "A-002"
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
+    assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: newer_bottle.id }), text: "Tasted This"
   end
 
   test "show title includes producer wine and vintage and tasting note launch" do
@@ -31,6 +34,22 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Producer - Estate Red - 2024"
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
+  end
+
+  test "new preloads vintage from params" do
+    alpha_producer = Producer.create!(name: "Alpha Producer")
+    alpha_wine = Wine.create!(name: "Alpha Wine", producer: alpha_producer)
+    alpha_vintage = Vintage.create!(vintage: "2023", wine: alpha_wine)
+
+    get new_bottle_url(bottle: { vintage_id: @vintage.id })
+
+    assert_response :success
+    assert_select "select[name='bottle[vintage_id]'] option[selected][value=?]", @vintage.id
+    assert_select "select[name='bottle[vintage_id]'] option", "Producer - Estate Red (2024)"
+
+    option_texts = css_select("select[name='bottle[vintage_id]'] option").map(&:text)
+    assert_operator option_texts.index("Alpha Producer - Alpha Wine (2023)"), :<,
+      option_texts.index("Producer - Estate Red (2024)")
   end
 
   test "creates updates and deletes bottle" do

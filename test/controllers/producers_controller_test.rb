@@ -27,6 +27,14 @@ class ProducersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h2", "Wines"
     assert_select "a[href=?]", wine_path(wine), "Estate Red"
+    assert_select "a[href=?]", new_wine_path(wine: { producer_id: producer.id }), "New Wine"
+  end
+
+  test "new labels name as producer name" do
+    get new_producer_url
+
+    assert_response :success
+    assert_select "label[for='producer_name']", "Producer Name"
   end
 
   test "creates updates and deletes producer" do

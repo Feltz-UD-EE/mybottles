@@ -13,4 +13,8 @@ class Vintage < ApplicationRecord
   def display_name
     [ wine.display_name, vintage ].compact_blank.join(" - ")
   end
+
+  def selection_name
+    "#{wine.display_name} (#{vintage})"
+  end
 end
