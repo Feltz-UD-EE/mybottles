@@ -1,0 +1,61 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Review</h1>
+  </div>
+
+  <section class="related-section">
+    <h2>Pending New Entries</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Target</th>
+            <th>Action</th>
+            <th>Submitted by</th>
+            <th>Age</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @pending_records.each do |record| %>
+            <tr>
+              <td><%= record.class.model_name.human %></td>
+              <td><%= link_to record.review_target_name, review_record_path(record) %></td>
+              <td>Create</td>
+              <td><%= record.created_by_user&.email %></td>
+              <td><%= time_ago_in_words(record.created_at) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="related-section">
+    <h2>Pending Proposed Changes</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Target</th>
+            <th>Action</th>
+            <th>Submitted by</th>
+            <th>Age</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @proposed_changes.each do |change| %>
+            <tr>
+              <td>Proposed Change</td>
+              <td><%= link_to change.target.review_target_name, review_proposed_change_path(change) %></td>
+              <td><%= change.action %></td>
+              <td><%= change.proposed_by_user.email %></td>
+              <td><%= time_ago_in_words(change.submitted_at) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

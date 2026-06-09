@@ -21,12 +21,27 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body data-controller="theme" data-theme-preference-key-value="my-bottles-theme" data-theme-dark-class="theme-dark">
+  <body class="<%= user_theme_class %>">
     <%= render "shared/header" %>
 
     <div class="page-shell">
       <% flash.each do |type, message| %>
         <div class="flash flash--<%= type %>"><%= message %></div>
+      <% end %>
+
+      <% if pending_promotion_event %>
+        <aside class="splash">
+          <h2>Congratulations</h2>
+          <p>You have been promoted to <strong><%= pending_promotion_event.to_trust_level %></strong>.</p>
+          <% if pending_promotion_event.to_trust_level == "Curator" %>
+            <p>You can now review Producer, Wine, and Vintage submissions, and use User Review to evaluate contributor activity.</p>
+            <div class="actions">
+              <%= link_to "Review", review_root_path, class: "button button--primary" %>
+              <%= link_to "User Review", user_review_root_path, class: "button" %>
+            </div>
+          <% end %>
+          <%= button_to "Dismiss", dismiss_user_trust_event_path(pending_promotion_event), method: :patch, class: "button" %>
+        </aside>
       <% end %>
 
       <%= yield %>

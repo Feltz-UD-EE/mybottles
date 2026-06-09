@@ -1,12 +1,15 @@
 class VintagesController < ApplicationController
+  include CommunityCuratedController
+
   before_action :set_vintage, only: %i[ show edit update destroy ]
 
   def index
-    @vintages = Vintage.includes(wine: :producer).order("producers.name", "wines.name", "vintages.vintage")
+    @vintages = visible_scope(Vintage).includes(wine: :producer).order("producers.name", "wines.name", "vintages.vintage")
   end
 
   def show
-    @bottles = @vintage.bottles.order(:purchase_date, :personal_inventory)
+    @pending_changes = ProposedChange.pending.for_target(@vintage).where(proposed_by_user: current_user)
+    @bottles = @vintage.bottles.visible_to(current_user).order(:purchase_date, :personal_inventory)
   end
 
   def new
@@ -27,8 +30,8 @@ class VintagesController < ApplicationController
   end
 
   def update
-    if @vintage.update(vintage_params)
-      redirect_to @vintage, notice: "Vintage was successfully updated."
+    if handle_community_update(@vintage, vintage_params)
+      redirect_to @vintage, notice: community_update_notice(@vintage)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -45,7 +48,7 @@ class VintagesController < ApplicationController
   private
 
   def set_vintage
-    @vintage = Vintage.find(params.expect(:id))
+    @vintage = visible_scope(Vintage).find(params.expect(:id))
   end
 
   def vintage_params

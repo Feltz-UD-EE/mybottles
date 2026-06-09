@@ -1,6 +1,6 @@
 <header class="site-header" data-controller="menu">
   <div class="site-header__inner">
-    <%= link_to root_path, class: "site-logo", aria: { label: "My Bottles home" } do %>
+    <%= link_to(user_signed_in? ? dashboard_path : root_path, class: "site-logo", aria: { label: "My Bottles home" }) do %>
       <%= image_tag "my_bottles_mark.svg", class: "site-logo__mark", alt: "" %>
       <span class="site-logo__text">My Bottles</span>
     <% end %>
@@ -14,50 +14,71 @@
 
     <nav id="primary-menu" class="primary-menu" data-menu-target="panel" aria-label="Main menu">
       <ul class="primary-menu__list">
-        <li class="primary-menu__item primary-menu__item--has-children">
-          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Cellars</a>
-          <ul class="primary-menu__submenu" aria-label="Cellars submenu">
-            <li><%= link_to "Cellars", cellars_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Bins", bins_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Bays", bays_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Shelves", shelves_path, class: "primary-menu__link" %></li>
-          </ul>
-        </li>
-        <li class="primary-menu__item"><%= link_to "Watch List", watch_list_entries_path, class: "primary-menu__link" %></li>
+        <% if user_signed_in? %>
+          <li class="primary-menu__item primary-menu__item--has-children">
+            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Cellars</a>
+            <ul class="primary-menu__submenu" aria-label="Cellars submenu">
+              <li><%= link_to "Cellars", cellars_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Bins", bins_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Bays", bays_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Shelves", shelves_path, class: "primary-menu__link" %></li>
+            </ul>
+          </li>
+          <li class="primary-menu__item"><%= link_to "Watch List", watch_list_entries_path, class: "primary-menu__link" %></li>
+        <% end %>
         <li class="primary-menu__item primary-menu__item--has-children">
           <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Geography</a>
           <ul class="primary-menu__submenu" aria-label="Geography submenu">
-            <li><%= link_to "Countries", countries_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Regions", regions_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Countries", user_signed_in? ? countries_path : public_regions_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Regions", user_signed_in? ? regions_path : public_regions_path, class: "primary-menu__link" %></li>
           </ul>
         </li>
-        <li class="primary-menu__item primary-menu__item--has-children">
-          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Clubs</a>
-          <ul class="primary-menu__submenu" aria-label="Clubs submenu">
-            <li><%= link_to "Current", wine_clubs_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "All", all_wine_clubs_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "New", new_wine_club_path, class: "primary-menu__link" %></li>
-          </ul>
-        </li>
+        <% if user_signed_in? %>
+          <li class="primary-menu__item primary-menu__item--has-children">
+            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Clubs</a>
+            <ul class="primary-menu__submenu" aria-label="Clubs submenu">
+              <li><%= link_to "Current", wine_clubs_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "All", all_wine_clubs_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "New", new_wine_club_path, class: "primary-menu__link" %></li>
+            </ul>
+          </li>
+        <% end %>
         <li class="primary-menu__item primary-menu__item--has-children">
           <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Data</a>
           <ul class="primary-menu__submenu" aria-label="Data submenu">
-            <li><%= link_to "Producers", producers_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Wines", wines_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Vintages", vintages_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Bottles", bottles_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Tasting Notes", tasting_notes_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Producers", user_signed_in? ? producers_path : public_producers_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Wines", user_signed_in? ? wines_path : public_wines_path, class: "primary-menu__link" %></li>
+            <% if user_signed_in? %>
+              <li><%= link_to "Vintages", vintages_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Bottles", bottles_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Tasting Notes", tasting_notes_path, class: "primary-menu__link" %></li>
+            <% end %>
           </ul>
         </li>
+        <% if reviewer? %>
+          <li class="primary-menu__item"><%= link_to "Review", review_root_path, class: "primary-menu__link" %></li>
+          <li class="primary-menu__item primary-menu__item--has-children">
+            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">User Review</a>
+            <ul class="primary-menu__submenu" aria-label="User Review submenu">
+              <li><%= link_to "Trusted Users", user_review_trusted_users_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Basic Users", user_review_basic_users_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Stats", user_review_stats_path, class: "primary-menu__link" %></li>
+              <% if system_administrator? %>
+                <li><%= link_to "All Users", user_review_all_users_path, class: "primary-menu__link" %></li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+        <% if user_signed_in? %>
+          <li class="primary-menu__item"><%= link_to "My profile", profile_path, class: "primary-menu__link" %></li>
+          <% if system_administrator? %>
+            <li class="primary-menu__item"><%= link_to "Invite User", new_invitation_path, class: "primary-menu__link" %></li>
+          <% end %>
+          <li class="primary-menu__item"><%= button_to "Log out", destroy_user_session_path, method: :delete, class: "primary-menu__link" %></li>
+        <% else %>
+          <li class="primary-menu__item"><%= link_to "Log in", new_user_session_path, class: "primary-menu__link" %></li>
+        <% end %>
       </ul>
-
-      <button class="theme-toggle" type="button" data-action="theme#toggle" data-theme-target="button" aria-pressed="false">
-        <span data-theme-target="label">Dark mode</span>
-      </button>
-
-      <button class="theme-toggle" type="button" data-controller="label-printing" data-action="label-printing#toggle" data-label-printing-target="button" data-label-printing-preference-key-value="my-bottles-print-labels" aria-pressed="false">
-        <span data-label-printing-target="label">Print labels</span>
-      </button>
     </nav>
   </div>
 </header>

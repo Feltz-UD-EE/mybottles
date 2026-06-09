@@ -1,0 +1,26 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>User Review Stats</h1>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Basic users count</td><td><%= @counts.fetch("Basic", 0) %></td></tr>
+        <tr><td>Trusted users count</td><td><%= @counts.fetch("Trusted", 0) %></td></tr>
+        <tr><td>Curator users count</td><td><%= @counts.fetch("Curator", 0) %></td></tr>
+        <tr><td>System Administrator users count</td><td><%= @counts.fetch("System Administrator", 0) %></td></tr>
+        <tr><td>Basic users created 90 days</td><td><%= @basic_users_created_90_days %></td></tr>
+        <tr><td>Trusted users promoted 90 days</td><td><%= @promotions_90_days.fetch("Trusted", 0) %></td></tr>
+        <tr><td>Curator users promoted 90 days</td><td><%= @promotions_90_days.fetch("Curator", 0) %></td></tr>
+        <tr><td>System Administrator users promoted 90 days</td><td><%= @promotions_90_days.fetch("System Administrator", 0) %></td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>

@@ -1,0 +1,44 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Edit profile</h1>
+    <%= link_to "Back to profile", profile_path, class: "button" %>
+  </div>
+
+  <%= render "shared/errors", resource: @user %>
+
+  <%= form_with model: @user, url: profile_path, method: :patch, class: "resource-form" do |form| %>
+    <div class="field">
+      <%= form.label :name %>
+      <%= form.text_field :name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :email %>
+      <%= form.email_field :email %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password, "New password" %>
+      <%= form.password_field :password, autocomplete: "new-password" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :password_confirmation %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :theme_preference %>
+      <%= form.select :theme_preference, User::THEME_PREFERENCES %>
+    </div>
+
+    <div class="field checkbox-field">
+      <%= form.check_box :print_labels_by_default %>
+      <%= form.label :print_labels_by_default %>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Save" %>
+    </div>
+  <% end %>
+</main>

@@ -1,12 +1,15 @@
 class WinesController < ApplicationController
+  include CommunityCuratedController
+
   before_action :set_wine, only: %i[ show edit update destroy ]
 
   def index
-    @wines = Wine.includes(:producer).order("producers.name", "wines.name")
+    @wines = visible_scope(Wine).includes(:producer).order("producers.name", "wines.name")
   end
 
   def show
-    @vintages = @wine.vintages.includes(:bottles).order(:vintage)
+    @pending_changes = ProposedChange.pending.for_target(@wine).where(proposed_by_user: current_user)
+    @vintages = @wine.vintages.visible_to(current_user).includes(:bottles).order(:vintage)
   end
 
   def new
@@ -27,8 +30,8 @@ class WinesController < ApplicationController
   end
 
   def update
-    if @wine.update(wine_params)
-      redirect_to @wine, notice: "Wine was successfully updated."
+    if handle_community_update(@wine, wine_params)
+      redirect_to @wine, notice: community_update_notice(@wine)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -45,7 +48,7 @@ class WinesController < ApplicationController
   private
 
   def set_wine
-    @wine = Wine.find(params.expect(:id))
+    @wine = visible_scope(Wine).find(params.expect(:id))
   end
 
   def wine_params

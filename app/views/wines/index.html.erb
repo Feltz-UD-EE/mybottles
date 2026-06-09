@@ -26,7 +26,7 @@
           <% @wines.each do |wine| %>
             <tr data-table-target="row">
               <td data-table-sort-value="producer"><%= link_to wine.producer.name, wine.producer %></td>
-              <td data-table-sort-value="name"><%= link_to wine.name, wine %></td>
+              <td data-table-sort-value="name"><%= link_to wine.name, wine %> <%= community_status_tag(wine) %> <%= pending_edit_tag(wine) %></td>
               <td><%= wine.style %></td>
               <td><%= wine.color %></td>
               <td><%= wine.appellation %></td>

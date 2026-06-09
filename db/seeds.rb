@@ -5,6 +5,8 @@ require "date"
 PURCHASE_SEED_PATH = Rails.root.join("db/seeds/purchases.csv")
 TASTING_NOTE_SEED_PATH = Rails.root.join("db/seeds/tasting_notes.csv")
 
+Current.user = User.bootstrap_system_administrator!
+
 def seed_blank(value)
   value = value.to_s.strip
   value.empty? ? nil : value

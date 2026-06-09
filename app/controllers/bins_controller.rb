@@ -2,7 +2,7 @@ class BinsController < ApplicationController
   before_action :set_bin, only: %i[ show edit update destroy ]
 
   def index
-    @bins = Bin.includes(:cellar).order("cellars.name", "bins.label")
+    @bins = Bin.visible_to(current_user).includes(:cellar).order("cellars.name", "bins.label")
   end
 
   def show
@@ -44,7 +44,7 @@ class BinsController < ApplicationController
   private
 
   def set_bin
-    @bin = Bin.find(params.expect(:id))
+    @bin = Bin.visible_to(current_user).find(params.expect(:id))
   end
 
   def bin_params

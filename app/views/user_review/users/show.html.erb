@@ -1,0 +1,85 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @user.email %></h1>
+    <div class="actions">
+      <% if @user.next_trust_level && (@user.basic? || system_administrator?) %>
+        <%= button_to "Promote", promote_user_review_user_path(@user), method: :patch, class: "button button--primary" %>
+      <% end %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Name</dt>
+    <dd><%= @user.name %></dd>
+    <dt>Trust level</dt>
+    <dd><%= @user.trust_level %></dd>
+    <dt>Account created</dt>
+    <dd><%= @user.created_at&.to_date&.iso8601 %></dd>
+    <dt>Days since account creation</dt>
+    <dd><%= @metrics.days_since_account_creation %></dd>
+  </dl>
+
+  <section class="related-section">
+    <h2>Suggested Edits</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Submitted</th>
+            <th>Target type</th>
+            <th>Target</th>
+            <th>Status</th>
+            <th>Reviewed</th>
+            <th>Reviewed by</th>
+            <th>Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @suggested_edits.each do |change| %>
+            <tr>
+              <td><%= change.submitted_at&.to_date&.iso8601 %></td>
+              <td><%= change.target_type %></td>
+              <td><%= change.target.review_target_name %></td>
+              <td><%= change.status %></td>
+              <td><%= change.reviewed_at&.to_date&.iso8601 %></td>
+              <td><%= change.reviewed_by_user&.email %></td>
+              <td><%= change.changed_fields %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="related-section">
+    <h2>New Entries</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Created</th>
+            <th>Entry type</th>
+            <th>Entry</th>
+            <th>Status</th>
+            <th>Reviewed</th>
+            <th>Reviewed by</th>
+            <th>Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @new_entries.each do |entry| %>
+            <tr>
+              <td><%= entry.created_at&.to_date&.iso8601 %></td>
+              <td><%= entry.class.model_name.human %></td>
+              <td><%= entry.review_target_name %></td>
+              <td><%= entry.approval_status %></td>
+              <td><%= (entry.approved_at || entry.rejected_at)&.to_date&.iso8601 %></td>
+              <td><%= (entry.approved_by_user || entry.rejected_by_user)&.email %></td>
+              <td><%= entry.review_target_name %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

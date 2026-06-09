@@ -1,8 +1,10 @@
 class ProducersController < ApplicationController
+  include CommunityCuratedController
+
   before_action :set_producer, only: %i[ show edit update destroy ]
 
   def index
-    @producers = Producer.order(:name)
+    @producers = visible_scope(Producer).order(:name)
     @producer_inventory_counts = Bottle
       .joins(vintage: :wine)
       .where(disposal_date: nil)
@@ -11,7 +13,8 @@ class ProducersController < ApplicationController
   end
 
   def show
-    @wines = @producer.wines.order(:name)
+    @pending_changes = ProposedChange.pending.for_target(@producer).where(proposed_by_user: current_user)
+    @wines = @producer.wines.visible_to(current_user).order(:name)
   end
 
   def new
@@ -32,8 +35,8 @@ class ProducersController < ApplicationController
   end
 
   def update
-    if @producer.update(producer_params)
-      redirect_to @producer, notice: "Producer was successfully updated."
+    if handle_community_update(@producer, producer_params)
+      redirect_to @producer, notice: community_update_notice(@producer)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -50,7 +53,7 @@ class ProducersController < ApplicationController
   private
 
   def set_producer
-    @producer = Producer.find(params.expect(:id))
+    @producer = visible_scope(Producer).find(params.expect(:id))
   end
 
   def producer_params

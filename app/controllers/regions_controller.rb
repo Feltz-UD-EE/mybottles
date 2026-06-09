@@ -2,6 +2,7 @@
 class RegionsController < ApplicationController
   before_action :set_region, only: %i[ show edit update destroy ]
   before_action :load_form_options, only: %i[ new edit create update ]
+  before_action :authorize_system_administrator, except: %i[ index show ]
 
   def index
     @country = Country.find(params[:country_id]) if params[:country_id].present?
@@ -67,5 +68,9 @@ class RegionsController < ApplicationController
     @countries = Country.order(:name)
     @parent_regions = Appellation.includes(:country).order(:name)
     @parent_regions = @parent_regions.where.not(id: @region.id) if defined?(@region) && @region&.persisted?
+  end
+
+  def authorize_system_administrator
+    authorize :system_administrator, :update?
   end
 end

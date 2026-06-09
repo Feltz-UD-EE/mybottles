@@ -3,7 +3,7 @@ class TastingNotesController < ApplicationController
   before_action :load_vintage_options, only: %i[ new edit create update ]
 
   def index
-    @tasting_notes = TastingNote.includes(:tasteable).order(date: :desc)
+    @tasting_notes = TastingNote.visible_to(current_user).includes(:tasteable).order(date: :desc)
   end
 
   def show
@@ -52,7 +52,7 @@ class TastingNotesController < ApplicationController
   private
 
   def set_tasting_note
-    @tasting_note = TastingNote.find(params.expect(:id))
+    @tasting_note = TastingNote.visible_to(current_user).find(params.expect(:id))
   end
 
   def tasting_note_params
@@ -73,9 +73,9 @@ class TastingNotesController < ApplicationController
 
     @tasting_note.tasteable =
       if explicit_type == "Bottle" && explicit_id.present?
-        Bottle.find(explicit_id)
+        Bottle.visible_to(current_user).find(explicit_id)
       elsif explicit_type == "Vintage" && explicit_id.present?
-        Vintage.find(explicit_id)
+        Vintage.visible_to(current_user).find(explicit_id)
       elsif new_wine_params[:producer_name].present? || new_wine_params[:wine_name].present? || new_wine_params[:vintage].present?
         find_or_create_inline_vintage
       else
@@ -137,6 +137,6 @@ class TastingNotesController < ApplicationController
   end
 
   def load_vintage_options
-    @vintage_options = Vintage.includes(wine: :producer).order("producers.name", "wines.name", "vintages.vintage")
+    @vintage_options = Vintage.visible_to(current_user).includes(wine: :producer).order("producers.name", "wines.name", "vintages.vintage")
   end
 end

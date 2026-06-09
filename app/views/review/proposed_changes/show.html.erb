@@ -1,0 +1,58 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Proposed Change</h1>
+    <div class="actions">
+      <%= button_to "Approve", approve_review_proposed_change_path(@proposed_change), method: :patch, class: "button button--primary" %>
+      <%= button_to "Reject", reject_review_proposed_change_path(@proposed_change), method: :patch, class: "button button--danger" %>
+      <%= button_to "Supersede", supersede_review_proposed_change_path(@proposed_change), method: :patch, class: "button" %>
+    </div>
+  </div>
+
+  <% if @proposed_change.drifted? %>
+    <div class="flash flash--alert">The canonical record has changed since this proposal was submitted.</div>
+  <% end %>
+
+  <dl class="resource-details">
+    <dt>Target</dt>
+    <dd><%= @proposed_change.target.review_target_name %></dd>
+    <dt>Submitted by</dt>
+    <dd><%= @proposed_change.proposed_by_user.email %></dd>
+    <dt>Status</dt>
+    <dd><%= @proposed_change.status %></dd>
+    <dt>Changed fields</dt>
+    <dd><%= @proposed_change.changed_fields %></dd>
+  </dl>
+
+  <section class="related-section">
+    <h2>Diff</h2>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Original</th>
+            <th>Proposed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @proposed_change.proposed_attributes.each do |name, value| %>
+            <tr>
+              <td><%= name %></td>
+              <td><%= @proposed_change.original_attributes[name] %></td>
+              <td><%= value %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="related-section">
+    <h2>Other Pending Proposals For This Target</h2>
+    <ul>
+      <% @related_changes.each do |change| %>
+        <li><%= link_to "#{change.proposed_by_user.email}: #{change.changed_fields}", review_proposed_change_path(change) %></li>
+      <% end %>
+    </ul>
+  </section>
+</main>

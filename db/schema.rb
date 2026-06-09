@@ -10,10 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_09_124800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "activities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "trackable_type"
+    t.uuid "trackable_id"
+    t.string "owner_type"
+    t.uuid "owner_id"
+    t.string "key"
+    t.text "parameters"
+    t.string "recipient_type"
+    t.uuid "recipient_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id"], name: "index_activities_on_owner"
+    t.index ["recipient_type", "recipient_id"], name: "index_activities_on_recipient"
+    t.index ["trackable_type", "trackable_id"], name: "index_activities_on_trackable"
+  end
 
   create_table "appellations", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "An appellation is a legally defined, named region for wine production. The appellation system for wines was first pioneered in France. All wines either have an appellation, or as a default, a country. Appellations are often nested within each other.", force: :cascade do |t|
     t.uuid "country_id", null: false, comment: "What country the appellation is in"
@@ -35,7 +51,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "notes", comment: "Any other descriptive information about the bay"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
     t.index ["cellar_id"], name: "index_bays_on_cellar_id"
+    t.index ["user_id"], name: "index_bays_on_user_id"
   end
 
   create_table "bins", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "A bin is a large, unstructured storage element within a cellar. A bin is typically, though not always, used to store multiple bottles of the same vintage.", force: :cascade do |t|
@@ -45,7 +63,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "notes", comment: "Any other descriptive information about the bin"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
     t.index ["cellar_id"], name: "index_bins_on_cellar_id"
+    t.index ["user_id"], name: "index_bins_on_user_id"
   end
 
   create_table "bottles", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Bottles are individual units of sales of a wine. People purchase and store bottles, often times multiple bottles of a given vintage.", force: :cascade do |t|
@@ -62,7 +82,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.datetime "updated_at", null: false
     t.string "cellarable_type"
     t.uuid "cellarable_id", comment: "Where this bottle is cellared"
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
     t.index ["cellarable_type", "cellarable_id"], name: "index_bottles_on_cellarable"
+    t.index ["user_id"], name: "index_bottles_on_user_id"
     t.index ["vintage_id"], name: "index_bottles_on_vintage_id"
     t.check_constraint "cellarable_type IS NULL OR (cellarable_type::text = ANY (ARRAY['Cellar'::character varying, 'Bin'::character varying, 'Shelf'::character varying]::text[]))", name: "chk_bottles_cellarable_type"
     t.check_constraint "disposal_method IS NULL OR (disposal_method = ANY (ARRAY['Drink'::text, 'Gift'::text, 'Sale'::text, 'Spoiled'::text]))", name: "chk_bottles_disposal_method"
@@ -75,6 +97,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "notes", comment: "Any other descriptive information about the cellar"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
+    t.index ["user_id"], name: "index_cellars_on_user_id"
   end
 
   create_table "countries", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Countries are just what they say they are - the top political bodies.", force: :cascade do |t|
@@ -95,8 +119,45 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "phone", comment: "The contact phone number of the producer"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "approval_status", default: "Approved", null: false, comment: "Review status for this record"
+    t.uuid "created_by_user_id", comment: "User who first created this record"
+    t.uuid "approved_by_user_id", comment: "User who approved this record"
+    t.datetime "approved_at", comment: "When this record was approved"
+    t.uuid "rejected_by_user_id", comment: "User who rejected this record"
+    t.datetime "rejected_at", comment: "When this record was rejected"
+    t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.index ["approved_by_user_id"], name: "index_producers_on_approved_by_user_id"
+    t.index ["created_by_user_id"], name: "index_producers_on_created_by_user_id"
+    t.index ["merged_into_id"], name: "index_producers_on_merged_into_id"
+    t.index ["rejected_by_user_id"], name: "index_producers_on_rejected_by_user_id"
+    t.check_constraint "approval_status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Merged'::text])", name: "producers_approval_status_check"
     t.check_constraint "email IS NULL OR email = ''::text OR email ~* '^[^@[:space:]]+@[^@[:space:]]+[.][^@[:space:]]+$'::text", name: "chk_producers_email_format"
     t.check_constraint "website IS NULL OR website = ''::text OR website ~* '^https?://[^[:space:]]+$'::text", name: "chk_producers_website_http_url"
+  end
+
+  create_table "proposed_changes", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Proposed changes are pending edits or merge proposals for community-curated canonical data.", force: :cascade do |t|
+    t.text "target_type", null: false, comment: "The model type being changed"
+    t.uuid "target_id", null: false, comment: "The record being changed"
+    t.uuid "proposed_by_user_id", null: false, comment: "User who submitted the proposal"
+    t.uuid "reviewed_by_user_id", comment: "User who reviewed the proposal"
+    t.text "status", default: "Pending", null: false, comment: "Review status"
+    t.text "action", null: false, comment: "What kind of proposal this is"
+    t.jsonb "proposed_attributes", default: {}, null: false, comment: "Proposed attribute values"
+    t.jsonb "original_attributes", default: {}, null: false, comment: "Canonical values when the proposal was submitted"
+    t.jsonb "reviewer_attributes", comment: "Reviewer-edited values applied at approval"
+    t.text "duplicate_of_type", comment: "Proposed canonical duplicate target type"
+    t.uuid "duplicate_of_id", comment: "Proposed canonical duplicate target id"
+    t.text "review_notes", comment: "Notes from reviewer"
+    t.datetime "submitted_at", null: false, comment: "When the proposal was submitted"
+    t.datetime "reviewed_at", comment: "When the proposal was reviewed"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["duplicate_of_type", "duplicate_of_id"], name: "idx_on_duplicate_of_type_duplicate_of_id_725bbdb17c"
+    t.index ["proposed_by_user_id"], name: "index_proposed_changes_on_proposed_by_user_id"
+    t.index ["reviewed_by_user_id"], name: "index_proposed_changes_on_reviewed_by_user_id"
+    t.index ["target_type", "target_id"], name: "index_proposed_changes_on_target_type_and_target_id"
+    t.check_constraint "action = ANY (ARRAY['Update'::text, 'Merge'::text])", name: "proposed_changes_action_check"
+    t.check_constraint "status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Superseded'::text, 'Merged'::text, 'Needs More Info'::text])", name: "proposed_changes_status_check"
   end
 
   create_table "shelves", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "A shelf is a horizontal surface or rack suitable for placing bottles. Shelves often have small separators so that bottles are not touching each other and can be drawn out easily. Shelves may be one bottle deep or sometimes multiple bottles deep.", force: :cascade do |t|
@@ -108,7 +169,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "notes", comment: "Any other descriptive information about the shelf"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
     t.index ["shelveable_type", "shelveable_id"], name: "index_shelves_on_shelveable_type_and_shelveable_id"
+    t.index ["user_id"], name: "index_shelves_on_user_id"
     t.check_constraint "depth = ANY (ARRAY['Single'::text, 'Multiple'::text])", name: "chk_shelves_depth"
     t.check_constraint "shelveable_type::text = ANY (ARRAY['Cellar'::character varying, 'Bay'::character varying]::text[])", name: "chk_shelves_shelveable_type"
   end
@@ -128,7 +191,70 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.boolean "buy", comment: "Should I buy this wine (or buy it again if the tasting note refers to a bottle)"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
     t.index ["tasteable_type", "tasteable_id"], name: "index_tasting_notes_on_tasteable"
+    t.index ["user_id"], name: "index_tasting_notes_on_user_id"
+  end
+
+  create_table "user_trust_events", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "User trust events track promotions and demotions between trust levels.", force: :cascade do |t|
+    t.uuid "user_id", null: false, comment: "The user whose trust level changed"
+    t.uuid "actor_id", null: false, comment: "The user who changed the trust level"
+    t.text "from_trust_level", null: false, comment: "Trust level before the change"
+    t.text "to_trust_level", null: false, comment: "Trust level after the change"
+    t.text "action", null: false, comment: "Whether this event is a promotion or demotion"
+    t.text "notes", comment: "Optional notes about why the change was made"
+    t.datetime "dismissed_at", comment: "When the promoted user dismissed this event"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_user_trust_events_on_actor_id"
+    t.index ["user_id"], name: "index_user_trust_events_on_user_id"
+    t.check_constraint "action = ANY (ARRAY['Promotion'::text, 'Demotion'::text])", name: "user_trust_events_action_check"
+    t.check_constraint "from_trust_level = ANY (ARRAY['Basic'::text, 'Trusted'::text, 'Curator'::text, 'System Administrator'::text])", name: "user_trust_events_from_trust_level_check"
+    t.check_constraint "to_trust_level = ANY (ARRAY['Basic'::text, 'Trusted'::text, 'Curator'::text, 'System Administrator'::text])", name: "user_trust_events_to_trust_level_check"
+  end
+
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Users are people who can sign in, manage private cellar data, and participate in trust-based community data workflows.", force: :cascade do |t|
+    t.text "email", default: "", null: false, comment: "The user's email address"
+    t.text "encrypted_password", default: "", null: false, comment: "Devise encrypted password"
+    t.text "trust_level", default: "Basic", null: false, comment: "The user's trust level"
+    t.text "name", comment: "The user's display name"
+    t.text "theme_preference", default: "System", null: false, comment: "The user's preferred visual theme"
+    t.boolean "print_labels_by_default", default: false, null: false, comment: "Whether bottle creation should print labels by default"
+    t.text "reset_password_token", comment: "Token used for password reset"
+    t.datetime "reset_password_sent_at", comment: "When password reset instructions were sent"
+    t.datetime "remember_created_at", comment: "When the remember-me session was created"
+    t.integer "sign_in_count", default: 0, null: false, comment: "Number of sign-ins"
+    t.datetime "current_sign_in_at", comment: "Current sign-in timestamp"
+    t.datetime "last_sign_in_at", comment: "Previous sign-in timestamp"
+    t.text "current_sign_in_ip", comment: "Current sign-in IP"
+    t.text "last_sign_in_ip", comment: "Previous sign-in IP"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "invitation_token", comment: "Token used for invitations"
+    t.datetime "invitation_created_at", comment: "When an invitation was created"
+    t.datetime "invitation_sent_at", comment: "When an invitation was sent"
+    t.datetime "invitation_accepted_at", comment: "When an invitation was accepted"
+    t.integer "invitation_limit"
+    t.string "invited_by_type"
+    t.uuid "invited_by_id"
+    t.integer "invitations_count", default: 0
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by"
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.check_constraint "theme_preference = ANY (ARRAY['Light'::text, 'Dark'::text, 'System'::text])", name: "users_theme_preference_check"
+    t.check_constraint "trust_level = ANY (ARRAY['Basic'::text, 'Trusted'::text, 'Curator'::text, 'System Administrator'::text])", name: "users_trust_level_check"
+  end
+
+  create_table "versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "whodunnit"
+    t.datetime "created_at"
+    t.uuid "item_id", null: false
+    t.string "item_type", null: false
+    t.string "event", null: false
+    t.text "object"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   create_table "vintages", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Vintages are individual 'editions' of a wine. Vintages are usually named after the year that the grapes are harvested. Because producers sometimes blend across year boundaries, some vintages are edition names or numbers, or are just labelled as \"non-vintage\".", force: :cascade do |t|
@@ -137,7 +263,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "grapes", comment: "The list of grapes in the wine"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "approval_status", default: "Approved", null: false, comment: "Review status for this record"
+    t.uuid "created_by_user_id", comment: "User who first created this record"
+    t.uuid "approved_by_user_id", comment: "User who approved this record"
+    t.datetime "approved_at", comment: "When this record was approved"
+    t.uuid "rejected_by_user_id", comment: "User who rejected this record"
+    t.datetime "rejected_at", comment: "When this record was rejected"
+    t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.index ["approved_by_user_id"], name: "index_vintages_on_approved_by_user_id"
+    t.index ["created_by_user_id"], name: "index_vintages_on_created_by_user_id"
+    t.index ["merged_into_id"], name: "index_vintages_on_merged_into_id"
+    t.index ["rejected_by_user_id"], name: "index_vintages_on_rejected_by_user_id"
     t.index ["wine_id"], name: "index_vintages_on_wine_id"
+    t.check_constraint "approval_status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Merged'::text])", name: "vintages_approval_status_check"
   end
 
   create_table "watch_list_entries", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Watch list entries are vintages, wines, or general information about wines I want to purchase in the future.", force: :cascade do |t|
@@ -150,6 +288,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.datetime "deleted_at", comment: "When this watch list entry was soft-deleted"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
+    t.index ["user_id"], name: "index_watch_list_entries_on_user_id"
     t.index ["watchable_type", "watchable_id"], name: "index_watch_list_entries_on_watchable"
   end
 
@@ -167,7 +307,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "benefits", comment: "Any other benefits accruing to club members"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false, comment: "The user who owns this record"
     t.index ["producer_id"], name: "index_wine_clubs_on_producer_id"
+    t.index ["user_id"], name: "index_wine_clubs_on_user_id"
     t.check_constraint "delivery_method IS NULL OR (delivery_method = ANY (ARRAY['Shipping'::text, 'Pickup'::text]))", name: "chk_wine_clubs_delivery_method"
     t.check_constraint "discount IS NULL OR discount >= 0::numeric AND discount <= 100::numeric", name: "chk_wine_clubs_discount_percentage"
   end
@@ -181,7 +323,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
     t.text "appellation", comment: "The wine-growing region of the wine"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "approval_status", default: "Approved", null: false, comment: "Review status for this record"
+    t.uuid "created_by_user_id", comment: "User who first created this record"
+    t.uuid "approved_by_user_id", comment: "User who approved this record"
+    t.datetime "approved_at", comment: "When this record was approved"
+    t.uuid "rejected_by_user_id", comment: "User who rejected this record"
+    t.datetime "rejected_at", comment: "When this record was rejected"
+    t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.index ["approved_by_user_id"], name: "index_wines_on_approved_by_user_id"
+    t.index ["created_by_user_id"], name: "index_wines_on_created_by_user_id"
+    t.index ["merged_into_id"], name: "index_wines_on_merged_into_id"
     t.index ["producer_id"], name: "index_wines_on_producer_id"
+    t.index ["rejected_by_user_id"], name: "index_wines_on_rejected_by_user_id"
+    t.check_constraint "approval_status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Merged'::text])", name: "wines_approval_status_check"
     t.check_constraint "color IS NULL OR (color = ANY (ARRAY['Red'::text, 'White'::text, 'Rosé'::text, 'Orange'::text]))", name: "chk_wines_color"
     t.check_constraint "style IS NULL OR (style = ANY (ARRAY['Still'::text, 'Sparkling'::text, 'Fortified'::text, 'Flavored'::text]))", name: "chk_wines_style"
   end
@@ -189,9 +343,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
   add_foreign_key "appellations", "appellations", column: "parent_id", on_delete: :restrict
   add_foreign_key "appellations", "countries", on_delete: :restrict
   add_foreign_key "bays", "cellars", on_delete: :restrict
+  add_foreign_key "bays", "users"
   add_foreign_key "bins", "cellars", on_delete: :restrict
+  add_foreign_key "bins", "users"
+  add_foreign_key "bottles", "users"
   add_foreign_key "bottles", "vintages", on_delete: :restrict
+  add_foreign_key "cellars", "users"
+  add_foreign_key "producers", "producers", column: "merged_into_id"
+  add_foreign_key "producers", "users", column: "approved_by_user_id"
+  add_foreign_key "producers", "users", column: "created_by_user_id"
+  add_foreign_key "producers", "users", column: "rejected_by_user_id"
+  add_foreign_key "proposed_changes", "users", column: "proposed_by_user_id"
+  add_foreign_key "proposed_changes", "users", column: "reviewed_by_user_id"
+  add_foreign_key "shelves", "users"
+  add_foreign_key "tasting_notes", "users"
+  add_foreign_key "user_trust_events", "users"
+  add_foreign_key "user_trust_events", "users", column: "actor_id"
+  add_foreign_key "vintages", "users", column: "approved_by_user_id"
+  add_foreign_key "vintages", "users", column: "created_by_user_id"
+  add_foreign_key "vintages", "users", column: "rejected_by_user_id"
+  add_foreign_key "vintages", "vintages", column: "merged_into_id"
   add_foreign_key "vintages", "wines", on_delete: :restrict
+  add_foreign_key "watch_list_entries", "users"
   add_foreign_key "wine_clubs", "producers", on_delete: :restrict
+  add_foreign_key "wine_clubs", "users"
   add_foreign_key "wines", "producers", on_delete: :restrict
+  add_foreign_key "wines", "users", column: "approved_by_user_id"
+  add_foreign_key "wines", "users", column: "created_by_user_id"
+  add_foreign_key "wines", "users", column: "rejected_by_user_id"
+  add_foreign_key "wines", "wines", column: "merged_into_id"
 end

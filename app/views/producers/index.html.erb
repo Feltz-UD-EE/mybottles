@@ -24,7 +24,7 @@
         <tbody>
           <% @producers.each do |producer| %>
             <tr data-table-target="row">
-              <td data-table-sort-value="name"><%= link_to producer.name, producer %></td>
+              <td data-table-sort-value="name"><%= link_to producer.name, producer %> <%= community_status_tag(producer) %> <%= pending_edit_tag(producer) %></td>
               <td><%= producer.email %></td>
               <td><%= link_to producer.website, producer.website if producer.website.present? %></td>
               <td><%= producer.phone %></td>

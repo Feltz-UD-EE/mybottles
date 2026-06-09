@@ -1,0 +1,32 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @producer.name %></h1>
+    <%= link_to "Back to producers", public_producers_path, class: "button" %>
+  </div>
+
+  <section class="related-section">
+    <h2>Wines</h2>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Wine</th>
+            <th>Style</th>
+            <th>Color</th>
+            <th>Appellation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @wines.each do |wine| %>
+            <tr>
+              <td><%= link_to wine.name, public_wine_path(wine) %></td>
+              <td><%= wine.style %></td>
+              <td><%= wine.color %></td>
+              <td><%= wine.appellation %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

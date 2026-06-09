@@ -65,3 +65,9 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "devise", "~> 5.0"
+gem "devise_invitable", "~> 2.0"
+gem "pundit", "~> 2.5"
+gem "paper_trail", "~> 17.0"
+gem "public_activity", "~> 3.0"

@@ -1,0 +1,26 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Regions</h1>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Country</th>
+          <th>Region</th>
+          <th>Degree</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @regions.each do |region| %>
+          <tr>
+            <td><%= region.country.name %></td>
+            <td><%= link_to region.path_name, public_region_path(region) %></td>
+            <td><%= region.degree %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

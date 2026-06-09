@@ -1,4 +1,6 @@
 class TastingNote < ApplicationRecord
+  include OwnedByUser
+
   BOOLEAN = ActiveModel::Type::Boolean.new
 
   attr_accessor :buy_yes, :buy_no

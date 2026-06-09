@@ -1,4 +1,6 @@
 class Shelf < ApplicationRecord
+  include OwnedByUser
+
   DEPTHS = %w[Single Multiple].freeze
 
   belongs_to :shelveable, polymorphic: true

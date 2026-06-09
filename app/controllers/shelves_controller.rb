@@ -3,7 +3,7 @@ class ShelvesController < ApplicationController
   before_action :load_shelveable_options, only: %i[ new edit create update ]
 
   def index
-    @shelves = Shelf.all.sort_by(&:location_name)
+    @shelves = Shelf.visible_to(current_user).sort_by(&:location_name)
   end
 
   def show
@@ -52,7 +52,7 @@ class ShelvesController < ApplicationController
   private
 
   def set_shelf
-    @shelf = Shelf.find(params.expect(:id))
+    @shelf = Shelf.visible_to(current_user).find(params.expect(:id))
   end
 
   def shelf_params
@@ -60,8 +60,8 @@ class ShelvesController < ApplicationController
   end
 
   def load_shelveable_options
-    @shelveable_options = Cellar.order(:name).map { |cellar| [ cellar.name, "Cellar:#{cellar.id}" ] } +
-      Bay.includes(:cellar).sort_by(&:display_name).map { |bay| [ bay.display_name, "Bay:#{bay.id}" ] }
+    @shelveable_options = Cellar.visible_to(current_user).order(:name).map { |cellar| [ cellar.name, "Cellar:#{cellar.id}" ] } +
+      Bay.visible_to(current_user).includes(:cellar).sort_by(&:display_name).map { |bay| [ bay.display_name, "Bay:#{bay.id}" ] }
   end
 
   def apply_shelveable_selection(shelf, selection)

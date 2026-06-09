@@ -1,6 +1,6 @@
 <main class="page-section">
   <div class="page-header">
-    <h1><%= @producer.name %></h1>
+    <h1><%= @producer.name %> <%= community_status_tag(@producer) %> <%= pending_edit_tag(@producer) %></h1>
     <div class="actions">
       <%= link_to "Edit", edit_producer_path(@producer) %>
       <%= link_to "Back to producers", producers_path %>
@@ -35,7 +35,7 @@
         <tbody>
           <% @wines.each do |wine| %>
             <tr>
-              <td><%= link_to wine.name, wine %></td>
+              <td><%= link_to wine.name, wine %> <%= community_status_tag(wine) %></td>
               <td><%= wine.appellation %></td>
               <td><%= wine.style %></td>
               <td><%= wine.color %></td>

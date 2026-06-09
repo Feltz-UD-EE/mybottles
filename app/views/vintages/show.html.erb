@@ -1,6 +1,6 @@
 <main class="page-section">
   <div class="page-header">
-    <h1><%= @vintage.wine.producer.name %> - <%= @vintage.wine.name %> - <%= @vintage.vintage %></h1>
+    <h1><%= @vintage.wine.producer.name %> - <%= @vintage.wine.name %> - <%= @vintage.vintage %> <%= community_status_tag(@vintage) %> <%= pending_edit_tag(@vintage) %></h1>
     <div class="actions">
       <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), class: "button button--primary" %>
       <%= link_to "Edit", edit_vintage_path(@vintage) %>

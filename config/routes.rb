@@ -1,5 +1,59 @@
 Rails.application.routes.draw do
-  root "home#index"
+  devise_for :users, skip: :registrations
+  root "public/home#index"
+  get "dashboard", to: "home#index", as: :dashboard
+
+  resource :profile, only: %i[ show edit update ]
+  resources :invitations, only: %i[ new create ]
+
+  namespace :public do
+    resources :producers, only: %i[ index show ]
+    resources :wines, only: %i[ index show ]
+    resources :regions, only: %i[ index show ]
+  end
+
+  namespace :review do
+    root "dashboard#index"
+    resources :producers, controller: :community_records, type: "Producer", only: %i[ index show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :merge, on: :member
+    end
+    resources :wines, controller: :community_records, type: "Wine", only: %i[ index show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :merge, on: :member
+    end
+    resources :vintages, controller: :community_records, type: "Vintage", only: %i[ index show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :merge, on: :member
+    end
+    resources :proposed_changes, only: %i[ show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :supersede, on: :member
+    end
+  end
+
+  namespace :user_review do
+    root "stats#index"
+    get "trusted_users", to: "users#index", defaults: { trust_level: "Trusted" }, as: :trusted_users
+    get "basic_users", to: "users#index", defaults: { trust_level: "Basic" }, as: :basic_users
+    resources :users, only: %i[ show ] do
+      patch :promote, on: :member
+      patch :demote, on: :member
+    end
+    resource :stats, only: %i[ show ], controller: :stats
+    resources :all_users, only: %i[ index ] do
+      patch :promote, on: :member
+      patch :demote, on: :member
+    end
+  end
+
+  resources :user_trust_events, only: [] do
+    patch :dismiss, on: :member
+  end
 
   get "about", to: "static#about"
   get "legal", to: "static#legal"

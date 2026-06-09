@@ -1,4 +1,6 @@
 class Cellar < ApplicationRecord
+  include OwnedByUser
+
   has_many :bins, dependent: :restrict_with_error
   has_many :bays, dependent: :restrict_with_error
   has_many :shelves, as: :shelveable, dependent: :restrict_with_error

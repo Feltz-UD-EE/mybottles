@@ -3,11 +3,11 @@ class WineClubsController < ApplicationController
   before_action :load_producers, only: %i[ new edit create update ]
 
   def index
-    @wine_clubs = WineClub.current.includes(:producer).order("producers.name", "wine_clubs.tier")
+    @wine_clubs = WineClub.visible_to(current_user).current.includes(:producer).order("producers.name", "wine_clubs.tier")
   end
 
   def all
-    @wine_clubs = WineClub.includes(:producer).order("producers.name", "wine_clubs.tier")
+    @wine_clubs = WineClub.visible_to(current_user).includes(:producer).order("producers.name", "wine_clubs.tier")
   end
 
   def show
@@ -48,7 +48,7 @@ class WineClubsController < ApplicationController
   private
 
   def set_wine_club
-    @wine_club = WineClub.find(params.expect(:id))
+    @wine_club = WineClub.visible_to(current_user).find(params.expect(:id))
   end
 
   def wine_club_params
@@ -86,6 +86,6 @@ class WineClubsController < ApplicationController
   end
 
   def load_producers
-    @producers = Producer.order(:name)
+    @producers = Producer.visible_to(current_user).order(:name)
   end
 end

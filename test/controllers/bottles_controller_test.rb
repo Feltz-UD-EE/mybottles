@@ -92,7 +92,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     end
 
     bottle = Bottle.order(:created_at).last
-    assert_redirected_to bottle_url(bottle, print_label: true)
+    assert_redirected_to bottle_url(bottle, print_label: false)
     assert_equal cellar, bottle.cellarable
 
     patch bottle_url(bottle), params: { bottle: { personal_inventory: "A-003", vintage_id: @vintage.id, discount_price: "20.00", disposal_method: "Gift", disposal_date: "2026-06-07", cellarable_selection: "Bin:#{bin.id}" } }

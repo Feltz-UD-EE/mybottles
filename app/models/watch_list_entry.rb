@@ -1,4 +1,6 @@
 class WatchListEntry < ApplicationRecord
+  include OwnedByUser
+
   belongs_to :watchable, polymorphic: true, optional: true
 
   scope :active, -> { where(deleted_at: nil) }

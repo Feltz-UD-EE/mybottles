@@ -2,12 +2,12 @@ class WatchListEntriesController < ApplicationController
   before_action :set_watch_list_entry, only: %i[ show edit update destroy remove restore ]
 
   def index
-    @watch_list_entries = WatchListEntry.active.includes(:watchable).order(created_at: :desc)
-    @deleted_watch_list_entries_count = WatchListEntry.deleted.count
+    @watch_list_entries = WatchListEntry.visible_to(current_user).active.includes(:watchable).order(created_at: :desc)
+    @deleted_watch_list_entries_count = WatchListEntry.visible_to(current_user).deleted.count
   end
 
   def old_entries
-    @watch_list_entries = WatchListEntry.deleted.includes(:watchable).order(deleted_at: :desc)
+    @watch_list_entries = WatchListEntry.visible_to(current_user).deleted.includes(:watchable).order(deleted_at: :desc)
   end
 
   def show
@@ -60,7 +60,7 @@ class WatchListEntriesController < ApplicationController
   private
 
   def set_watch_list_entry
-    @watch_list_entry = WatchListEntry.find(params.expect(:id))
+    @watch_list_entry = WatchListEntry.visible_to(current_user).find(params.expect(:id))
   end
 
   def watch_list_entry_params
@@ -77,9 +77,9 @@ class WatchListEntriesController < ApplicationController
 
     @watch_list_entry.watchable =
       if explicit_type == "Wine" && explicit_id.present?
-        Wine.find(explicit_id)
+        Wine.visible_to(current_user).find(explicit_id)
       elsif explicit_type == "Vintage" && explicit_id.present?
-        Vintage.find(explicit_id)
+        Vintage.visible_to(current_user).find(explicit_id)
       else
         @watch_list_entry.watchable
       end

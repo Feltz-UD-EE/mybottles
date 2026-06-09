@@ -1,0 +1,39 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @wine.display_name %></h1>
+    <%= link_to "Back to wines", public_wines_path, class: "button" %>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Producer</dt>
+    <dd><%= link_to @wine.producer.name, public_producer_path(@wine.producer) %></dd>
+    <dt>Style</dt>
+    <dd><%= @wine.style %></dd>
+    <dt>Color</dt>
+    <dd><%= @wine.color %></dd>
+    <dt>Appellation</dt>
+    <dd><%= @wine.appellation %></dd>
+  </dl>
+
+  <section class="related-section">
+    <h2>Vintages</h2>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Vintage</th>
+            <th>Grapes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @vintages.each do |vintage| %>
+            <tr>
+              <td><%= vintage.vintage %></td>
+              <td><%= vintage.grapes %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

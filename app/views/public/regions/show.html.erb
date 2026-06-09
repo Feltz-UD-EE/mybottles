@@ -1,0 +1,15 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @region.path_name %></h1>
+    <%= link_to "Back to regions", public_regions_path, class: "button" %>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Country</dt>
+    <dd><%= @region.country.name %></dd>
+    <dt>Degree</dt>
+    <dd><%= @region.degree %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@region.notes) %></dd>
+  </dl>
+</main>

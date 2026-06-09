@@ -1,4 +1,6 @@
 class Bin < ApplicationRecord
+  include OwnedByUser
+
   belongs_to :cellar
   has_many :bottles, as: :cellarable, dependent: :restrict_with_error
 

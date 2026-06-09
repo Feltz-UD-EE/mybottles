@@ -1,0 +1,28 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @model.model_name.human.pluralize %> Review</h1>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Target</th>
+          <th>Status</th>
+          <th>Submitted by</th>
+          <th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @records.each do |record| %>
+          <tr>
+            <td><%= link_to record.review_target_name, review_record_path(record) %></td>
+            <td><%= community_status_tag(record) %></td>
+            <td><%= record.created_by_user&.email %></td>
+            <td><%= record.created_at&.to_date&.iso8601 %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

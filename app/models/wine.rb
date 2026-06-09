@@ -1,4 +1,6 @@
 class Wine < ApplicationRecord
+  include CommunityCurated
+
   STYLES = %w[Still Sparkling Fortified Flavored].freeze
   COLORS = [ "Red", "White", "Rosé", "Orange" ].freeze
 

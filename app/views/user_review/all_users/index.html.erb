@@ -1,0 +1,35 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>All Users</h1>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Account creation date</th>
+          <th>Trust level</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td><%= link_to user.email, user_review_user_path(user) %></td>
+            <td><%= user.created_at&.to_date&.iso8601 %></td>
+            <td><%= user.trust_level %></td>
+            <td class="actions">
+              <% if user.next_trust_level %>
+                <%= button_to "Promote", promote_user_review_all_user_path(user), method: :patch, class: "button button--primary" %>
+              <% end %>
+              <% if user.previous_trust_level && !user.system_administrator? %>
+                <%= button_to "Demote", demote_user_review_all_user_path(user), method: :patch, class: "button" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

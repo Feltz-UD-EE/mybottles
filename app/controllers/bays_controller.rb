@@ -2,7 +2,7 @@ class BaysController < ApplicationController
   before_action :set_bay, only: %i[ show edit update destroy ]
 
   def index
-    @bays = Bay.includes(:cellar).order("cellars.name", "bays.label")
+    @bays = Bay.visible_to(current_user).includes(:cellar).order("cellars.name", "bays.label")
   end
 
   def show
@@ -45,7 +45,7 @@ class BaysController < ApplicationController
   private
 
   def set_bay
-    @bay = Bay.find(params.expect(:id))
+    @bay = Bay.visible_to(current_user).find(params.expect(:id))
   end
 
   def bay_params

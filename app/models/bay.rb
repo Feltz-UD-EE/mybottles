@@ -1,4 +1,6 @@
 class Bay < ApplicationRecord
+  include OwnedByUser
+
   belongs_to :cellar
   has_many :shelves, as: :shelveable, dependent: :restrict_with_error
 

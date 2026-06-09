@@ -1,0 +1,28 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Invite User</h1>
+  </div>
+
+  <%= render "shared/errors", resource: @user %>
+
+  <%= form_with model: @user, url: invitations_path, class: "resource-form" do |form| %>
+    <div class="field">
+      <%= form.label :email %>
+      <%= form.email_field :email, required: true %>
+    </div>
+
+    <div class="field">
+      <%= form.label :name %>
+      <%= form.text_field :name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :trust_level %>
+      <%= form.select :trust_level, User::TRUST_LEVELS %>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Send Invitation" %>
+    </div>
+  <% end %>
+</main>

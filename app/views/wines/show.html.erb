@@ -1,6 +1,6 @@
 <main class="page-section">
   <div class="page-header">
-    <h1><%= @wine.producer.name %> - <%= @wine.name %></h1>
+    <h1><%= @wine.producer.name %> - <%= @wine.name %> <%= community_status_tag(@wine) %> <%= pending_edit_tag(@wine) %></h1>
     <div class="actions">
       <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Wine", watchable_id: @wine.id }), class: "button button--primary" %>
       <%= link_to "Edit", edit_wine_path(@wine) %>
@@ -37,7 +37,7 @@
         <tbody>
           <% @vintages.each do |vintage| %>
             <tr>
-              <td><%= link_to vintage.vintage, vintage %></td>
+              <td><%= link_to vintage.vintage, vintage %> <%= community_status_tag(vintage) %></td>
               <td><%= vintage.bottles.size %></td>
               <td><%= vintage.bottles.count(&:in_inventory?) %></td>
             </tr>

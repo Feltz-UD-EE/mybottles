@@ -2,7 +2,7 @@ class CellarsController < ApplicationController
   before_action :set_cellar, only: %i[ show edit update destroy ]
 
   def index
-    @cellars = Cellar.order(:name)
+    @cellars = Cellar.visible_to(current_user).order(:name)
   end
 
   def show
@@ -47,7 +47,7 @@ class CellarsController < ApplicationController
   private
 
   def set_cellar
-    @cellar = Cellar.find(params.expect(:id))
+    @cellar = Cellar.visible_to(current_user).find(params.expect(:id))
   end
 
   def cellar_params

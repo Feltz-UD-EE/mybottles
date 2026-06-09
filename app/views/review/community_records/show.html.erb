@@ -1,0 +1,33 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @record.review_target_name %></h1>
+    <div class="actions">
+      <%= button_to "Approve", approve_review_record_path(@record), method: :patch, class: "button button--primary" %>
+      <%= button_to "Reject", reject_review_record_path(@record), method: :patch, class: "button button--danger" %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Type</dt>
+    <dd><%= @record.class.model_name.human %></dd>
+    <dt>Status</dt>
+    <dd><%= community_status_tag(@record) %></dd>
+    <dt>Submitted by</dt>
+    <dd><%= @record.created_by_user&.email %></dd>
+    <dt>Submitted</dt>
+    <dd><%= @record.created_at&.to_date&.iso8601 %></dd>
+  </dl>
+
+  <section class="related-section">
+    <h2>Merge Duplicate</h2>
+    <%= form_with url: merge_review_record_path(@record), method: :patch, class: "resource-form" do |form| %>
+      <div class="field">
+        <%= label_tag :canonical_id, "Canonical target" %>
+        <%= select_tag :canonical_id, options_from_collection_for_select(@canonical_options, :id, :review_target_name) %>
+      </div>
+      <div class="form-actions">
+        <%= form.submit "Merge" %>
+      </div>
+    <% end %>
+  </section>
+</main>

@@ -3,7 +3,7 @@ class BottlesController < ApplicationController
   before_action :load_cellarable_options, only: %i[ new edit create update ]
 
   def index
-    @bottles = Bottle.includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
+    @bottles = Bottle.visible_to(current_user).includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
   end
 
   def show
@@ -42,7 +42,7 @@ class BottlesController < ApplicationController
     @bottle = Bottle.new(attributes)
 
     if apply_cellarable_selection(@bottle, selection) && @bottle.save
-      redirect_to bottle_url(@bottle, print_label: true), notice: "Bottle was successfully created."
+      redirect_to bottle_url(@bottle, print_label: current_user.print_labels_by_default?), notice: "Bottle was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -71,7 +71,7 @@ class BottlesController < ApplicationController
   private
 
   def set_bottle
-    @bottle = Bottle.find(params.expect(:id))
+    @bottle = Bottle.visible_to(current_user).find(params.expect(:id))
   end
 
   def bottle_label_url(bottle)
@@ -84,9 +84,9 @@ class BottlesController < ApplicationController
 
   def load_cellarable_options
     @cellarable_options = [ [ "Not Cellared", "" ] ] +
-      Cellar.order(:name).map { |cellar| [ cellar.name, "Cellar:#{cellar.id}" ] } +
-      Bin.includes(:cellar).sort_by(&:display_name).map { |bin| [ bin.display_name, "Bin:#{bin.id}" ] } +
-      Shelf.all.sort_by(&:location_name).map { |shelf| [ shelf.location_name, "Shelf:#{shelf.id}" ] }
+      Cellar.visible_to(current_user).order(:name).map { |cellar| [ cellar.name, "Cellar:#{cellar.id}" ] } +
+      Bin.visible_to(current_user).includes(:cellar).sort_by(&:display_name).map { |bin| [ bin.display_name, "Bin:#{bin.id}" ] } +
+      Shelf.visible_to(current_user).sort_by(&:location_name).map { |shelf| [ shelf.location_name, "Shelf:#{shelf.id}" ] }
   end
 
   def apply_cellarable_selection(bottle, selection)

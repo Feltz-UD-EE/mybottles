@@ -1,0 +1,35 @@
+admin:
+  email: johncfeltz@gmail.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Bottle4Bottle") %>
+  trust_level: System Administrator
+  name: System Administrator
+  theme_preference: System
+  print_labels_by_default: false
+  sign_in_count: 0
+
+curator:
+  email: curator@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
+  trust_level: Curator
+  name: Curator User
+  theme_preference: System
+  print_labels_by_default: false
+  sign_in_count: 0
+
+trusted:
+  email: trusted@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
+  trust_level: Trusted
+  name: Trusted User
+  theme_preference: System
+  print_labels_by_default: false
+  sign_in_count: 0
+
+basic:
+  email: basic@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
+  trust_level: Basic
+  name: Basic User
+  theme_preference: System
+  print_labels_by_default: false
+  sign_in_count: 0

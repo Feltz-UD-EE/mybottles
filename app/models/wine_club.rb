@@ -1,4 +1,6 @@
 class WineClub < ApplicationRecord
+  include OwnedByUser
+
   DELIVERY_METHODS = %w[Shipping Pickup].freeze
 
   belongs_to :producer

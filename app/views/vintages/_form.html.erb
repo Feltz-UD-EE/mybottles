@@ -3,7 +3,7 @@
 
   <div class="field">
     <%= form.label :wine_id, "Wine" %>
-    <%= form.collection_select :wine_id, Wine.includes(:producer).sort_by(&:display_name), :id, :display_name, { prompt: "Select a wine" }, required: true %>
+    <%= form.collection_select :wine_id, Wine.visible_to(current_user).includes(:producer).sort_by(&:display_name), :id, :display_name, { prompt: "Select a wine" }, required: true %>
   </div>
 
   <div class="field">

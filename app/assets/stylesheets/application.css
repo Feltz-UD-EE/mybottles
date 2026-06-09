@@ -319,6 +319,53 @@ a {
   border-color: #b65353;
 }
 
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-left: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: var(--color-row-alt);
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-tag--pending,
+.status-tag--pending-review {
+  border-color: #b58a2a;
+  color: #8a651c;
+}
+
+.status-tag--rejected {
+  border-color: #b65353;
+  color: #9d3838;
+}
+
+.status-tag--merged {
+  border-color: #4f8a62;
+  color: #2f6f44;
+}
+
+.splash {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 18px;
+  border: 1px solid var(--color-accent);
+  border-radius: 8px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.splash h2,
+.splash p {
+  margin: 0;
+}
+
 .button,
 .actions a,
 .actions button,

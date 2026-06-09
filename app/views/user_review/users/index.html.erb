@@ -1,0 +1,55 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @trust_level %> Users</h1>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table data-table--compact">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Days</th>
+          <th>Edits</th>
+          <th>Approved</th>
+          <th>Rejected</th>
+          <th>Entries</th>
+          <th>Entry Approved</th>
+          <th>Entry Rejected</th>
+          <th>Edits 90d</th>
+          <th>Approved 90d</th>
+          <th>Rejected 90d</th>
+          <th>Entries 90d</th>
+          <th>Entry Approved 90d</th>
+          <th>Entry Rejected 90d</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <% metrics = @metrics.fetch(user) %>
+          <tr>
+            <td><%= link_to user.email, user_review_user_path(user) %></td>
+            <td><%= metrics.days_since_account_creation %></td>
+            <td><%= metrics.suggested_edits_count %></td>
+            <td><%= metrics.suggested_edits_approved_count %></td>
+            <td><%= metrics.suggested_edits_rejected_count %></td>
+            <td><%= metrics.new_entries_count %></td>
+            <td><%= metrics.new_entries_approved_count %></td>
+            <td><%= metrics.new_entries_rejected_count %></td>
+            <td><%= metrics.suggested_edits_count_90_days %></td>
+            <td><%= metrics.suggested_edits_approved_90_days %></td>
+            <td><%= metrics.suggested_edits_rejected_90_days %></td>
+            <td><%= metrics.new_entries_count_90_days %></td>
+            <td><%= metrics.new_entries_approved_90_days %></td>
+            <td><%= metrics.new_entries_rejected_90_days %></td>
+            <td>
+              <% if user.next_trust_level && (user.basic? || system_administrator?) %>
+                <%= button_to "Promote", promote_user_review_user_path(user), method: :patch, class: "button button--primary" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

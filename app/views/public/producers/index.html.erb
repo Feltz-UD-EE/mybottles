@@ -1,0 +1,24 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Producers</h1>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Website</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @producers.each do |producer| %>
+          <tr>
+            <td><%= link_to producer.name, public_producer_path(producer) %></td>
+            <td><%= link_to producer.website, producer.website if producer.website.present? %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</main>

@@ -1,5 +1,6 @@
 class CountriesController < ApplicationController
   before_action :set_country, only: %i[ show edit update destroy ]
+  before_action :authorize_system_administrator, except: %i[ index show ]
 
   def index
     @countries = Country.order(:name)
@@ -50,5 +51,9 @@ class CountriesController < ApplicationController
 
   def country_params
     params.expect(country: %i[ name fullname iso2 iso3 notes ])
+  end
+
+  def authorize_system_administrator
+    authorize :system_administrator, :update?
   end
 end

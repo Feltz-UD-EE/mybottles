@@ -1,4 +1,6 @@
 class Producer < ApplicationRecord
+  include CommunityCurated
+
   EMAIL_FORMAT = /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/
   HTTP_URL_FORMAT = /\Ahttps?:\/\/\S+\z/
 
@@ -17,6 +19,10 @@ class Producer < ApplicationRecord
   end
 
   def to_s
+    name
+  end
+
+  def display_name
     name
   end
 end

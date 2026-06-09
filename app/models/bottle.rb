@@ -1,4 +1,6 @@
 class Bottle < ApplicationRecord
+  include OwnedByUser
+
   DISPOSAL_METHODS = %w[Drink Gift Sale Spoiled].freeze
 
   belongs_to :vintage

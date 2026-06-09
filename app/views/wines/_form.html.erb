@@ -7,7 +7,7 @@
       <p><%= link_to wine.producer.name, wine.producer %></p>
       <%= form.hidden_field :producer_id %>
     <% else %>
-      <%= form.collection_select :producer_id, Producer.order(:name), :id, :name, { prompt: "Select a producer" }, required: true %>
+      <%= form.collection_select :producer_id, Producer.visible_to(current_user).order(:name), :id, :name, { prompt: "Select a producer" }, required: true %>
     <% end %>
   </div>
 

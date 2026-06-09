@@ -1,0 +1,19 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>My profile</h1>
+    <%= link_to "Edit profile", edit_profile_path, class: "button button--primary" %>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Name</dt>
+    <dd><%= @user.name %></dd>
+    <dt>Email</dt>
+    <dd><%= @user.email %></dd>
+    <dt>Trust level</dt>
+    <dd><%= @user.trust_level %></dd>
+    <dt>Theme preference</dt>
+    <dd><%= @user.theme_preference %></dd>
+    <dt>Print labels by default</dt>
+    <dd><%= @user.print_labels_by_default? ? "Yes" : "No" %></dd>
+  </dl>
+</main>
