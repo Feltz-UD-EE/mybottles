@@ -1,0 +1,45 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @country.name %></h1>
+    <div class="actions">
+      <%= link_to "New Region", new_region_path(country_id: @country.id), class: "button button--primary" %>
+      <%= link_to "All regions", regions_path(country_id: @country.id) %>
+      <%= link_to "Edit", edit_country_path(@country) %>
+      <%= link_to "Back to countries", countries_path %>
+      <%= button_to "Delete", @country, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this country?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Full name</dt>
+    <dd><%= @country.fullname %></dd>
+    <dt>ISO-2</dt>
+    <dd><%= @country.iso2 %></dd>
+    <dt>ISO-3</dt>
+    <dd><%= @country.iso3 %></dd>
+    <dt>Named regions:</dt>
+    <dd><%= @country.named_region_count %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@country.notes) %></dd>
+  </dl>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Regions</h2>
+      <%= link_to "New Region", new_region_path(country_id: @country.id), class: "button button--primary" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Degree</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial: "regions/tree_row", collection: @root_regions, as: :region, locals: { depth: 0 } %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

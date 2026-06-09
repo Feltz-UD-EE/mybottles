@@ -10,10 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_08_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_08_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  create_table "appellations", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "An appellation is a legally defined, named region for wine production. The appellation system for wines was first pioneered in France. All wines either have an appellation, or as a default, a country. Appellations are often nested within each other.", force: :cascade do |t|
+    t.uuid "country_id", null: false, comment: "What country the appellation is in"
+    t.text "name", null: false, comment: "The nametag or other label applied to the bin"
+    t.text "degree", comment: "The legal category of appellations - many countries have two or more"
+    t.uuid "parent_id", comment: "The parent appellation, if present"
+    t.text "notes", comment: "Any other descriptive information about the appellation"
+    t.boolean "auto_generated", default: false, null: false, comment: "Whether the information for this appellation was LLM-generated"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["country_id"], name: "index_appellations_on_country_id"
+    t.index ["parent_id"], name: "index_appellations_on_parent_id"
+  end
 
   create_table "bays", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "A bay is a section of a cellar. Bays are composed of racks of shelves.", force: :cascade do |t|
     t.uuid "cellar_id", null: false, comment: "What cellar the bay is located in"
@@ -60,6 +73,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_120000) do
     t.text "name", null: false, comment: "A convenient name for a cellar"
     t.text "location", comment: "Where the cellar is located"
     t.text "notes", comment: "Any other descriptive information about the cellar"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "countries", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Countries are just what they say they are - the top political bodies.", force: :cascade do |t|
+    t.text "name", null: false, comment: "The common name for the country"
+    t.text "fullname", comment: "The full legal name of the country"
+    t.text "iso2", null: false, comment: "The ISO-2 country code for the country"
+    t.text "iso3", null: false, comment: "The ISO-3 country code for the country"
+    t.text "notes", comment: "Other descriptive notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -163,6 +186,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_08_120000) do
     t.check_constraint "style IS NULL OR (style = ANY (ARRAY['Still'::text, 'Sparkling'::text, 'Fortified'::text, 'Flavored'::text]))", name: "chk_wines_style"
   end
 
+  add_foreign_key "appellations", "appellations", column: "parent_id", on_delete: :restrict
+  add_foreign_key "appellations", "countries", on_delete: :restrict
   add_foreign_key "bays", "cellars", on_delete: :restrict
   add_foreign_key "bins", "cellars", on_delete: :restrict
   add_foreign_key "bottles", "vintages", on_delete: :restrict

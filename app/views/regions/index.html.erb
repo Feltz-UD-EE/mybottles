@@ -1,0 +1,48 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @country ? "#{@country.name} Regions" : "Regions" %></h1>
+    <%= link_to "New region", new_region_path(appellation: { country_id: @country&.id }), class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="region-search">Search regions</label>
+      <input id="region-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="country">Country</button></th>
+            <th><button type="button" data-action="table#sort" data-table-column="region">Region</button></th>
+            <th>Degree</th>
+            <th>Parent</th>
+            <th>Auto-generated</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @regions.each do |region| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="country"><%= link_to region.country.name, region.country %></td>
+              <td data-table-sort-value="region"><%= link_to region.path_name, region_path(region) %></td>
+              <td><%= region.degree %></td>
+              <td><%= link_to region.parent.path_name, region_path(region.parent) if region.parent.present? %></td>
+              <td><%= region.auto_generated? ? "Yes" : "No" %></td>
+              <td class="actions"><%= link_to "Edit", edit_region_path(region) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No regions yet." if @regions.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

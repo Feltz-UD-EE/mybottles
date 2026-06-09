@@ -1,0 +1,5 @@
+<tr>
+  <td style="padding-left: <%= depth * 24 %>px"><%= link_to region.name, region_path(region) %></td>
+  <td><%= region.degree %></td>
+</tr>
+<%= render partial: "regions/tree_row", collection: region.children.order(:name), as: :region, locals: { depth: depth + 1 } %>

@@ -398,6 +398,10 @@ a {
   gap: 8px;
 }
 
+.field.checkbox-field input[type="checkbox"] {
+  width: auto;
+}
+
 .field label,
 .field-label,
 .resource-details dt {

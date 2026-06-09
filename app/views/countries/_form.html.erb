@@ -1,0 +1,32 @@
+<%= form_with(model: country, class: "resource-form") do |form| %>
+  <%= render "shared/errors", resource: country %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :fullname, "Full name" %>
+    <%= form.text_field :fullname %>
+  </div>
+
+  <div class="field">
+    <%= form.label :iso2, "ISO-2" %>
+    <%= form.text_field :iso2, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :iso3, "ISO-3" %>
+    <%= form.text_field :iso3, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit class: "button button--primary" %>
+  </div>
+<% end %>

@@ -1,0 +1,30 @@
+# Geography appellation seeds for ROU.
+# Source: Romanian wine PDO/region summaries
+seed_appellations_for("ROU", [
+  { name: "Aiud", degree: "DOC" },
+  { name: "Alba Iulia", degree: "DOC" },
+  { name: "Babadag", degree: "DOC" },
+  { name: "Banu Mărăcine", degree: "DOC" },
+  { name: "Bohotin", degree: "DOC" },
+  { name: "Cernavodă", degree: "DOC" },
+  { name: "Cotnari", degree: "DOC" },
+  { name: "Crișana", degree: "DOC" },
+  { name: "Dealu Bujorului", degree: "DOC" },
+  { name: "Dealu Mare", degree: "DOC" },
+  { name: "Drăgășani", degree: "DOC" },
+  { name: "Huși", degree: "DOC" },
+  { name: "Iași", degree: "DOC" },
+  { name: "Miniș-Măderat", degree: "DOC" },
+  { name: "Murfatlar", degree: "DOC" },
+  { name: "Nicorești", degree: "DOC" },
+  { name: "Odobești", degree: "DOC" },
+  { name: "Panciu", degree: "DOC" },
+  { name: "Pietroasa", degree: "DOC" },
+  { name: "Recaș", degree: "DOC" },
+  { name: "Sâmburești", degree: "DOC" },
+  { name: "Sebeș-Apold", degree: "DOC" },
+  { name: "Segarcea", degree: "DOC" },
+  { name: "Târnave", degree: "DOC" },
+  { name: "Vânju Mare", degree: "DOC" },
+  { name: "Vrancea", degree: "DOC" }
+])

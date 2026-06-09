@@ -1,0 +1,46 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Countries</h1>
+    <%= link_to "New country", new_country_path, class: "button button--primary" %>
+  </div>
+
+  <section data-controller="table" data-table-per-page-value="25">
+    <div class="table-toolbar">
+      <label for="country-search">Search countries</label>
+      <input id="country-search" class="table-search" type="search" data-table-target="query" data-action="input->table#search">
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th><button type="button" data-action="table#sort" data-table-column="name">Country</button></th>
+            <th>ISO-2</th>
+            <th>ISO-3</th>
+            <th>Named regions:</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @countries.each do |country| %>
+            <tr data-table-target="row">
+              <td data-table-sort-value="name"><%= link_to country.name, country %></td>
+              <td><%= country.iso2 %></td>
+              <td><%= country.iso3 %></td>
+              <td><%= country.named_region_count %></td>
+              <td class="actions"><%= link_to "Edit", edit_country_path(country) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No countries yet." if @countries.empty? %></p>
+
+    <div class="table-pagination">
+      <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
+      <span data-table-target="pageLabel">Page 1</span>
+      <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
+    </div>
+  </section>
+</main>

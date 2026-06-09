@@ -16,6 +16,9 @@ Rails.application.routes.draw do
   resources :bins
   resources :bays
   resources :shelves
+  resources :countries
+  # Appellations use "Region" language in the UI and routes for buyer-friendly display.
+  resources :regions, controller: :regions
   resources :tasting_notes
   resources :wine_clubs do
     get :all, on: :collection

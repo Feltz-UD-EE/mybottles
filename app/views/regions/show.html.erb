@@ -1,0 +1,44 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @region.path_name %></h1>
+    <div class="actions">
+      <%= link_to "New Child Region", new_region_path(appellation: { country_id: @region.country_id, parent_id: @region.id }), class: "button button--primary" %>
+      <%= link_to "Edit", edit_region_path(@region) %>
+      <%= link_to "Back to regions", regions_path %>
+      <%= button_to "Delete", region_path(@region), method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this region?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Country</dt>
+    <dd><%= link_to @region.country.name, @region.country %></dd>
+    <dt>Degree</dt>
+    <dd><%= @region.degree %></dd>
+    <dt>Parent region</dt>
+    <dd><%= link_to @region.parent.path_name, region_path(@region.parent) if @region.parent.present? %></dd>
+    <dt>Auto-generated</dt>
+    <dd><%= @region.auto_generated? ? "Yes" : "No" %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@region.notes) %></dd>
+  </dl>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Child Regions</h2>
+      <%= link_to "New Child Region", new_region_path(appellation: { country_id: @region.country_id, parent_id: @region.id }), class: "button button--primary" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Degree</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%= render partial: "tree_row", collection: @child_regions, as: :region, locals: { depth: 0 } %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
