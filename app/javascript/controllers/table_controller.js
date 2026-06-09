@@ -1,15 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["query", "row", "pageLabel", "previousButton", "nextButton"]
+  static targets = ["query", "row", "pageLabel", "rowCount", "previousButton", "nextButton"]
   static values = {
     page: { type: Number, default: 1 },
     perPage: { type: Number, default: 25 },
     sortColumn: String,
+    sortIndex: { type: Number, default: -1 },
     sortDirection: { type: String, default: "asc" }
   }
 
   connect() {
+    this.prepareSortableHeaders()
     this.render()
   }
 
@@ -19,17 +21,37 @@ export default class extends Controller {
   }
 
   sort(event) {
-    const column = event.currentTarget.dataset.tableColumn
-    if (!column) return
+    const header = event.currentTarget.closest("th")
+    const column = event.currentTarget.dataset.tableColumn || ""
+    const index = column ? -1 : header.cellIndex
+    const sortKey = column || `column-${index}`
 
-    if (this.sortColumnValue === column) {
+    if (this.currentSortKey === sortKey) {
       this.sortDirectionValue = this.sortDirectionValue === "asc" ? "desc" : "asc"
     } else {
       this.sortColumnValue = column
+      this.sortIndexValue = index
       this.sortDirectionValue = "asc"
     }
 
     this.render()
+  }
+
+  prepareSortableHeaders() {
+    this.element.querySelectorAll("thead th").forEach((header) => {
+      if (header.querySelector("button")) return
+      if (header.textContent.trim().length === 0) return
+
+      header.classList.add("data-table__sortable-header")
+      header.tabIndex = 0
+      header.addEventListener("click", (event) => this.sort(event))
+      header.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return
+
+        event.preventDefault()
+        this.sort(event)
+      })
+    })
   }
 
   nextPage() {
@@ -57,12 +79,16 @@ export default class extends Controller {
       row.hidden = false
     })
 
-    this.updatePagination(pageCount)
+    this.updatePagination(pageCount, visibleRows.length)
   }
 
-  updatePagination(pageCount) {
+  updatePagination(pageCount, visibleRowCount) {
     if (this.hasPageLabelTarget) {
       this.pageLabelTarget.textContent = `Page ${this.pageValue} of ${pageCount}`
+    }
+
+    if (this.hasRowCountTarget) {
+      this.rowCountTarget.textContent = `${visibleRowCount} ${visibleRowCount === 1 ? "row" : "rows"}`
     }
 
     if (this.hasPreviousButtonTarget) {
@@ -77,7 +103,7 @@ export default class extends Controller {
   get sortedRows() {
     const rows = [...this.rowTargets]
 
-    if (!this.sortColumnValue) return rows
+    if (!this.sortColumnValue && this.sortIndexValue < 0) return rows
 
     return rows.sort((left, right) => {
       const leftValue = this.sortValue(left)
@@ -89,8 +115,16 @@ export default class extends Controller {
   }
 
   sortValue(row) {
+    if (this.sortIndexValue >= 0) {
+      return row.cells[this.sortIndexValue]?.textContent.trim() || ""
+    }
+
     const cell = row.querySelector(`[data-table-sort-value="${this.sortColumnValue}"]`)
     return cell ? cell.textContent.trim() : ""
+  }
+
+  get currentSortKey() {
+    return this.sortColumnValue || `column-${this.sortIndexValue}`
   }
 
   get pageStart() {

@@ -36,4 +36,14 @@ class GrapeTest < ActiveSupport::TestCase
     assert_equal [ bordeaux ], syrah.allowed_appellations_with_source.map(&:first)
     assert_equal "Via Shiraz", syrah.allowed_appellations_with_source.first.second
   end
+
+  test "destroy cascades to synonym relationships on either side" do
+    syrah = Grape.create!(name: "Syrah")
+    shiraz = Grape.create!(name: "Shiraz")
+    GrapeSynonym.create!(grape: syrah, synonym_grape: shiraz)
+
+    assert_difference("GrapeSynonym.count", -1) do
+      shiraz.destroy!
+    end
+  end
 end

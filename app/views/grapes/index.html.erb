@@ -24,7 +24,7 @@
           <% @grapes.each do |grape| %>
             <tr data-table-target="row">
               <td data-table-sort-value="name"><%= link_to grape.name, grape %> <%= community_status_tag(grape) %> <%= pending_edit_tag(grape) %></td>
-              <td><%= grape.synonym_grapes.count %></td>
+              <td><%= grape.synonym_grapes.map(&:name).sort.join(", ") %></td>
               <td><%= grape.allowed_appellations_with_source.count %></td>
               <td class="actions"><%= link_to "Edit", edit_grape_path(grape) %></td>
             </tr>
@@ -38,6 +38,7 @@
     <div class="table-pagination">
       <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
       <span data-table-target="pageLabel">Page 1</span>
+      <span class="table-row-count" data-table-target="rowCount"></span>
       <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
     </div>
   </section>

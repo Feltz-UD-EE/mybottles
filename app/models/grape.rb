@@ -1,8 +1,8 @@
 class Grape < ApplicationRecord
   include CommunityCurated
 
-  has_many :grape_synonyms, dependent: :restrict_with_error
-  has_many :inverse_grape_synonyms, class_name: "GrapeSynonym", foreign_key: :synonym_grape_id, dependent: :restrict_with_error
+  has_many :grape_synonyms, dependent: :destroy
+  has_many :inverse_grape_synonyms, class_name: "GrapeSynonym", foreign_key: :synonym_grape_id, dependent: :destroy
   has_many :appellation_grapes, dependent: :restrict_with_error
   has_many :appellations, through: :appellation_grapes
 

@@ -33,7 +33,10 @@
             <tr>
               <td><%= link_to synonym.name, synonym %> <%= community_status_tag(relationship) %></td>
               <td><%= relationship.notes %></td>
-              <td class="actions"><%= link_to "Edit", edit_grape_synonym_path(relationship) %></td>
+              <td class="actions">
+                <%= link_to "Edit", edit_grape_synonym_path(relationship) %>
+                <%= button_to "X", relationship, method: :delete, class: "button icon-button icon-button--danger", form: { data: { turbo_confirm: "Remove this synonym?" } }, aria: { label: "Remove synonym" } %>
+              </td>
             </tr>
           <% end %>
         </tbody>

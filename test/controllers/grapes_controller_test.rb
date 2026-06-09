@@ -25,6 +25,7 @@ class GrapesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", /Syrah/
     assert_select "a[href=?]", grape_path(shiraz), "Shiraz"
+    assert_select "form[action=?]", grape_synonym_path(GrapeSynonym.first)
     assert_select "a[href=?]", region_path(bordeaux), "Bordeaux"
     assert_select "td", "Via Shiraz"
   end

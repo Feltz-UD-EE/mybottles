@@ -35,7 +35,7 @@
     <h2>Allowed Grapes</h2>
     <div data-nested-fields-target="container">
       <%= form.fields_for :appellation_grapes do |appellation_grape_form| %>
-        <div class="inline-fields nested-fields-row">
+        <div class="inline-fields nested-fields-row appellation-grape-fields">
           <%= appellation_grape_form.hidden_field :id %>
           <%= appellation_grape_form.hidden_field :_destroy, data: { nested_fields_target: "destroyField" } %>
 
@@ -49,13 +49,13 @@
             <%= appellation_grape_form.text_field :notes %>
           </div>
 
-          <button class="button" type="button" data-action="nested-fields#remove">Remove</button>
+          <button class="button icon-button icon-button--danger" type="button" data-action="nested-fields#remove" aria-label="Remove grape">X</button>
         </div>
       <% end %>
     </div>
 
     <template data-nested-fields-target="template">
-      <div class="inline-fields nested-fields-row">
+      <div class="inline-fields nested-fields-row appellation-grape-fields">
         <input autocomplete="off" type="hidden" value="false" name="appellation[appellation_grapes_attributes][NEW_RECORD][_destroy]" data-nested-fields-target="destroyField">
 
         <div class="field">
@@ -73,11 +73,11 @@
           <input type="text" name="appellation[appellation_grapes_attributes][NEW_RECORD][notes]" id="appellation_appellation_grapes_attributes_NEW_RECORD_notes">
         </div>
 
-        <button class="button" type="button" data-action="nested-fields#remove">Remove</button>
+        <button class="button icon-button icon-button--danger" type="button" data-action="nested-fields#remove" aria-label="Remove grape">X</button>
       </div>
     </template>
 
-    <button class="button" type="button" data-action="nested-fields#add">Add Grape</button>
+    <button class="button icon-button icon-button--success" type="button" data-action="nested-fields#add" aria-label="Add grape">+</button>
   </section>
 
   <div class="form-actions">

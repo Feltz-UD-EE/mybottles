@@ -539,6 +539,11 @@ a {
 
 .table-pagination {
   margin-top: 14px;
+  justify-content: flex-end;
+}
+
+.table-row-count {
+  color: var(--color-muted);
 }
 
 .watch-list-history {
@@ -562,7 +567,8 @@ a {
   border-radius: 8px;
 }
 
-.data-table th button {
+.data-table th button,
+.data-table__sortable-header {
   border: 0;
   padding: 0;
   background: transparent;
@@ -570,6 +576,32 @@ a {
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+}
+
+.data-table__sortable-header:hover {
+  color: var(--color-accent);
+}
+
+.appellation-grape-fields {
+  grid-template-columns: minmax(160px, 1fr) minmax(220px, 1.4fr) auto;
+  align-items: end;
+}
+
+.icon-button {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  font-weight: 700;
+}
+
+.icon-button--danger {
+  border-color: #b65353;
+  color: #b65353;
+}
+
+.icon-button--success {
+  border-color: #4f8a62;
+  color: #2f6f44;
 }
 
 .data-table--compact {
@@ -584,6 +616,26 @@ a {
 
 .data-table--compact td:first-child {
   width: 100%;
+}
+
+.table-cell--date {
+  white-space: nowrap;
+}
+
+.data-table--tasting-notes th:first-child,
+.data-table--tasting-notes td:first-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.data-table tbody tr.data-table__row--buy-yes,
+.data-table tbody tr.data-table__row--buy-yes:nth-child(even) {
+  background: rgba(79, 138, 98, 0.18);
+}
+
+.data-table tbody tr.data-table__row--buy-no,
+.data-table tbody tr.data-table__row--buy-no:nth-child(even) {
+  background: rgba(182, 83, 83, 0.18);
 }
 
 .related-section {

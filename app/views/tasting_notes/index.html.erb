@@ -11,7 +11,7 @@
     </div>
 
     <div class="table-wrapper">
-      <table class="data-table">
+      <table class="data-table data-table--tasting-notes">
         <thead>
           <tr>
             <th><button type="button" data-action="table#sort" data-table-column="date">Date</button></th>
@@ -24,8 +24,8 @@
         </thead>
         <tbody>
           <% @tasting_notes.each do |tasting_note| %>
-            <tr data-table-target="row">
-              <td data-table-sort-value="date"><%= tasting_note.date&.iso8601 %></td>
+            <tr data-table-target="row" class="<%= "data-table__row--buy-#{tasting_note.buy? ? "yes" : "no"}" unless tasting_note.buy.nil? %>">
+              <td class="table-cell--date" data-table-sort-value="date"><%= tasting_note.date&.iso8601 %></td>
               <td data-table-sort-value="wine"><%= link_to tasting_note.tasteable_name, tasting_note %></td>
               <td><%= tasting_note.setting %></td>
               <td><%= truncate(tasting_note.overall, length: 90) %></td>
@@ -42,6 +42,7 @@
     <div class="table-pagination">
       <button class="button" type="button" data-table-target="previousButton" data-action="table#previousPage">Previous</button>
       <span data-table-target="pageLabel">Page 1</span>
+      <span class="table-row-count" data-table-target="rowCount"></span>
       <button class="button" type="button" data-table-target="nextButton" data-action="table#nextPage">Next</button>
     </div>
   </section>
