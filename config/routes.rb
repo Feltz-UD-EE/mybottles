@@ -29,6 +29,21 @@ Rails.application.routes.draw do
       patch :reject, on: :member
       patch :merge, on: :member
     end
+    resources :grapes, controller: :community_records, type: "Grape", only: %i[ index show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :merge, on: :member
+    end
+    resources :grape_synonyms, controller: :community_records, type: "GrapeSynonym", only: %i[ index show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :merge, on: :member
+    end
+    resources :appellation_grapes, controller: :community_records, type: "AppellationGrape", only: %i[ index show ] do
+      patch :approve, on: :member
+      patch :reject, on: :member
+      patch :merge, on: :member
+    end
     resources :proposed_changes, only: %i[ show ] do
       patch :approve, on: :member
       patch :reject, on: :member
@@ -63,6 +78,9 @@ Rails.application.routes.draw do
   resources :producers
   resources :wines
   resources :vintages
+  resources :grapes
+  resources :grape_synonyms, only: %i[ create edit update destroy ]
+  resources :appellation_grapes, only: %i[ edit update destroy ]
   resources :bottles do
     get :label, on: :member
   end

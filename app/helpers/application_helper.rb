@@ -18,6 +18,9 @@ module ApplicationHelper
     when Producer then review_producer_path(record)
     when Wine then review_wine_path(record)
     when Vintage then review_vintage_path(record)
+    when Grape then review_grape_path(record)
+    when GrapeSynonym then review_grape_synonym_path(record)
+    when AppellationGrape then review_appellation_grape_path(record)
     else raise ArgumentError, "unsupported review record"
     end
   end
@@ -27,6 +30,9 @@ module ApplicationHelper
     when Producer then approve_review_producer_path(record)
     when Wine then approve_review_wine_path(record)
     when Vintage then approve_review_vintage_path(record)
+    when Grape then approve_review_grape_path(record)
+    when GrapeSynonym then approve_review_grape_synonym_path(record)
+    when AppellationGrape then approve_review_appellation_grape_path(record)
     else raise ArgumentError, "unsupported review record"
     end
   end
@@ -36,6 +42,9 @@ module ApplicationHelper
     when Producer then reject_review_producer_path(record)
     when Wine then reject_review_wine_path(record)
     when Vintage then reject_review_vintage_path(record)
+    when Grape then reject_review_grape_path(record)
+    when GrapeSynonym then reject_review_grape_synonym_path(record)
+    when AppellationGrape then reject_review_appellation_grape_path(record)
     else raise ArgumentError, "unsupported review record"
     end
   end
@@ -45,6 +54,9 @@ module ApplicationHelper
     when Producer then merge_review_producer_path(record)
     when Wine then merge_review_wine_path(record)
     when Vintage then merge_review_vintage_path(record)
+    when Grape then merge_review_grape_path(record)
+    when GrapeSynonym then merge_review_grape_synonym_path(record)
+    when AppellationGrape then merge_review_appellation_grape_path(record)
     else raise ArgumentError, "unsupported review record"
     end
   end

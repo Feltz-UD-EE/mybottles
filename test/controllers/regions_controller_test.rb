@@ -33,6 +33,39 @@ class RegionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", region_path(villages), "Côtes-du-Rhône Villages"
   end
 
+  test "show displays allowed grapes" do
+    bordeaux = Appellation.create!(country: @france, name: "Bordeaux")
+    merlot = Grape.create!(name: "Merlot")
+    AppellationGrape.create!(appellation: bordeaux, grape: merlot, notes: "Classic Bordeaux grape")
+
+    get region_url(bordeaux)
+
+    assert_response :success
+    assert_select "h2", "Allowed Grapes"
+    assert_select "a[href=?]", grape_path(merlot), "Merlot"
+    assert_select "td", "Classic Bordeaux grape"
+  end
+
+  test "form can add allowed grapes" do
+    bordeaux = Appellation.create!(country: @france, name: "Bordeaux")
+    merlot = Grape.create!(name: "Merlot")
+
+    assert_difference("AppellationGrape.count", 1) do
+      patch region_url(bordeaux), params: {
+        appellation: {
+          country_id: @france.id,
+          name: "Bordeaux",
+          appellation_grapes_attributes: {
+            "0" => { grape_id: merlot.id, notes: "Classic Bordeaux grape" }
+          }
+        }
+      }
+    end
+
+    assert_redirected_to region_url(bordeaux)
+    assert_equal "Classic Bordeaux grape", bordeaux.appellation_grapes.last.notes
+  end
+
   test "new preloads country and parent" do
     parent = Appellation.create!(country: @france, name: "Bordeaux")
 

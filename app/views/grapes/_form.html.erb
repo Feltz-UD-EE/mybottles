@@ -1,0 +1,17 @@
+<%= form_with(model: grape, class: "resource-form") do |form| %>
+  <%= render "shared/errors", resource: grape %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name, required: true %>
+  </div>
+
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit "Save", class: "button button--primary" %>
+  </div>
+<% end %>

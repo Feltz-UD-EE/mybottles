@@ -50,6 +50,7 @@
             <li><%= link_to "Wines", user_signed_in? ? wines_path : public_wines_path, class: "primary-menu__link" %></li>
             <% if user_signed_in? %>
               <li><%= link_to "Vintages", vintages_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Grapes", grapes_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Bottles", bottles_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Tasting Notes", tasting_notes_path, class: "primary-menu__link" %></li>
             <% end %>

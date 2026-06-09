@@ -13,13 +13,16 @@ class RegionsController < ApplicationController
 
   def show
     @child_regions = @region.children.order(:name)
+    @appellation_grapes = @region.appellation_grapes.visible_to(current_user).includes(:grape).order("grapes.name")
   end
 
   def new
     @region = Appellation.new(region_defaults)
+    @region.appellation_grapes.build
   end
 
   def edit
+    @region.appellation_grapes.build if @region.appellation_grapes.empty?
   end
 
   def create
@@ -55,7 +58,15 @@ class RegionsController < ApplicationController
   end
 
   def region_params
-    params.expect(appellation: %i[ country_id name degree parent_id notes auto_generated ])
+    params.require(:appellation).permit(
+      :country_id,
+      :name,
+      :degree,
+      :parent_id,
+      :notes,
+      :auto_generated,
+      appellation_grapes_attributes: %i[ id grape_id notes _destroy ]
+    )
   end
 
   def region_defaults
@@ -68,6 +79,7 @@ class RegionsController < ApplicationController
     @countries = Country.order(:name)
     @parent_regions = Appellation.includes(:country).order(:name)
     @parent_regions = @parent_regions.where.not(id: @region.id) if defined?(@region) && @region&.persisted?
+    @grapes = Grape.visible_to(current_user).order(:name)
   end
 
   def authorize_system_administrator

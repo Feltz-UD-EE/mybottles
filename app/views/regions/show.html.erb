@@ -41,4 +41,29 @@
       </table>
     </div>
   </section>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Allowed Grapes</h2>
+      <%= link_to "Edit Region", edit_region_path(@region), class: "button button--primary" %>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Grape</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @appellation_grapes.each do |appellation_grape| %>
+            <tr>
+              <td><%= link_to appellation_grape.grape.name, appellation_grape.grape %> <%= community_status_tag(appellation_grape) %></td>
+              <td><%= appellation_grape.notes %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </main>

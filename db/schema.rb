@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_09_124800) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_09_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -29,6 +29,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_124800) do
     t.index ["owner_type", "owner_id"], name: "index_activities_on_owner"
     t.index ["recipient_type", "recipient_id"], name: "index_activities_on_recipient"
     t.index ["trackable_type", "trackable_id"], name: "index_activities_on_trackable"
+  end
+
+  create_table "appellation_grapes", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Appellation grapes record grapes that are permitted in an appellation.", force: :cascade do |t|
+    t.uuid "appellation_id", null: false, comment: "The appellation where this grape is permitted"
+    t.uuid "grape_id", null: false, comment: "The permitted grape"
+    t.text "notes", comment: "Notes about this grape in this appellation"
+    t.text "approval_status", default: "Approved", null: false, comment: "Review status for this record"
+    t.uuid "created_by_user_id", comment: "User who first created this record"
+    t.uuid "approved_by_user_id", comment: "User who approved this record"
+    t.datetime "approved_at", comment: "When this record was approved"
+    t.uuid "rejected_by_user_id", comment: "User who rejected this record"
+    t.datetime "rejected_at", comment: "When this record was rejected"
+    t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appellation_id", "grape_id"], name: "index_appellation_grapes_on_appellation_and_grape", unique: true, where: "(approval_status <> 'Merged'::text)"
+    t.index ["appellation_id"], name: "index_appellation_grapes_on_appellation_id"
+    t.index ["approved_by_user_id"], name: "index_appellation_grapes_on_approved_by_user_id"
+    t.index ["created_by_user_id"], name: "index_appellation_grapes_on_created_by_user_id"
+    t.index ["grape_id"], name: "index_appellation_grapes_on_grape_id"
+    t.index ["merged_into_id"], name: "index_appellation_grapes_on_merged_into_id"
+    t.index ["rejected_by_user_id"], name: "index_appellation_grapes_on_rejected_by_user_id"
+    t.check_constraint "approval_status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Merged'::text])", name: "appellation_grapes_approval_status_check"
   end
 
   create_table "appellations", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "An appellation is a legally defined, named region for wine production. The appellation system for wines was first pioneered in France. All wines either have an appellation, or as a default, a country. Appellations are often nested within each other.", force: :cascade do |t|
@@ -109,6 +132,50 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_124800) do
     t.text "notes", comment: "Other descriptive notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "grape_synonyms", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Grape synonyms record that two grape records are known synonyms.", force: :cascade do |t|
+    t.uuid "grape_id", null: false, comment: "One grape in the synonym pair"
+    t.uuid "synonym_grape_id", null: false, comment: "The other grape in the synonym pair"
+    t.text "notes", comment: "Notes about the synonym relationship"
+    t.text "approval_status", default: "Approved", null: false, comment: "Review status for this record"
+    t.uuid "created_by_user_id", comment: "User who first created this record"
+    t.uuid "approved_by_user_id", comment: "User who approved this record"
+    t.datetime "approved_at", comment: "When this record was approved"
+    t.uuid "rejected_by_user_id", comment: "User who rejected this record"
+    t.datetime "rejected_at", comment: "When this record was rejected"
+    t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "LEAST(grape_id, synonym_grape_id), GREATEST(grape_id, synonym_grape_id)", name: "index_grape_synonyms_on_unordered_pair", unique: true, where: "(approval_status <> 'Merged'::text)"
+    t.index ["approved_by_user_id"], name: "index_grape_synonyms_on_approved_by_user_id"
+    t.index ["created_by_user_id"], name: "index_grape_synonyms_on_created_by_user_id"
+    t.index ["grape_id"], name: "index_grape_synonyms_on_grape_id"
+    t.index ["merged_into_id"], name: "index_grape_synonyms_on_merged_into_id"
+    t.index ["rejected_by_user_id"], name: "index_grape_synonyms_on_rejected_by_user_id"
+    t.index ["synonym_grape_id"], name: "index_grape_synonyms_on_synonym_grape_id"
+    t.check_constraint "approval_status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Merged'::text])", name: "grape_synonyms_approval_status_check"
+    t.check_constraint "grape_id <> synonym_grape_id", name: "grape_synonyms_distinct_grapes_check"
+  end
+
+  create_table "grapes", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Grapes are botanical wine-making grape varieties or recognized wine-making grape cultivars.", force: :cascade do |t|
+    t.text "name", null: false, comment: "The common display name of the grape"
+    t.text "notes", comment: "Notes about the grape"
+    t.text "approval_status", default: "Approved", null: false, comment: "Review status for this record"
+    t.uuid "created_by_user_id", comment: "User who first created this record"
+    t.uuid "approved_by_user_id", comment: "User who approved this record"
+    t.datetime "approved_at", comment: "When this record was approved"
+    t.uuid "rejected_by_user_id", comment: "User who rejected this record"
+    t.datetime "rejected_at", comment: "When this record was rejected"
+    t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_user_id"], name: "index_grapes_on_approved_by_user_id"
+    t.index ["created_by_user_id"], name: "index_grapes_on_created_by_user_id"
+    t.index ["merged_into_id"], name: "index_grapes_on_merged_into_id"
+    t.index ["name"], name: "index_grapes_on_name"
+    t.index ["rejected_by_user_id"], name: "index_grapes_on_rejected_by_user_id"
+    t.check_constraint "approval_status = ANY (ARRAY['Pending'::text, 'Approved'::text, 'Rejected'::text, 'Merged'::text])", name: "grapes_approval_status_check"
   end
 
   create_table "producers", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "Producers are individual, co-ops, corporations, and other entities that make wine. They may or may not own land with grapes. They may use their own grapes, purchased grapes, or a combination of the two. Producers typically, though not always, make more than one wine.", force: :cascade do |t|
@@ -340,6 +407,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_124800) do
     t.check_constraint "style IS NULL OR (style = ANY (ARRAY['Still'::text, 'Sparkling'::text, 'Fortified'::text, 'Flavored'::text]))", name: "chk_wines_style"
   end
 
+  add_foreign_key "appellation_grapes", "appellation_grapes", column: "merged_into_id"
+  add_foreign_key "appellation_grapes", "appellations"
+  add_foreign_key "appellation_grapes", "grapes"
+  add_foreign_key "appellation_grapes", "users", column: "approved_by_user_id"
+  add_foreign_key "appellation_grapes", "users", column: "created_by_user_id"
+  add_foreign_key "appellation_grapes", "users", column: "rejected_by_user_id"
   add_foreign_key "appellations", "appellations", column: "parent_id", on_delete: :restrict
   add_foreign_key "appellations", "countries", on_delete: :restrict
   add_foreign_key "bays", "cellars", on_delete: :restrict
@@ -349,6 +422,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_124800) do
   add_foreign_key "bottles", "users"
   add_foreign_key "bottles", "vintages", on_delete: :restrict
   add_foreign_key "cellars", "users"
+  add_foreign_key "grape_synonyms", "grape_synonyms", column: "merged_into_id"
+  add_foreign_key "grape_synonyms", "grapes"
+  add_foreign_key "grape_synonyms", "grapes", column: "synonym_grape_id"
+  add_foreign_key "grape_synonyms", "users", column: "approved_by_user_id"
+  add_foreign_key "grape_synonyms", "users", column: "created_by_user_id"
+  add_foreign_key "grape_synonyms", "users", column: "rejected_by_user_id"
+  add_foreign_key "grapes", "grapes", column: "merged_into_id"
+  add_foreign_key "grapes", "users", column: "approved_by_user_id"
+  add_foreign_key "grapes", "users", column: "created_by_user_id"
+  add_foreign_key "grapes", "users", column: "rejected_by_user_id"
   add_foreign_key "producers", "producers", column: "merged_into_id"
   add_foreign_key "producers", "users", column: "approved_by_user_id"
   add_foreign_key "producers", "users", column: "created_by_user_id"

@@ -1,0 +1,85 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1><%= @grape.name %> <%= community_status_tag(@grape) %> <%= pending_edit_tag(@grape) %></h1>
+    <div class="actions">
+      <%= link_to "Edit", edit_grape_path(@grape) %>
+      <%= link_to "Back to grapes", grapes_path %>
+      <%= button_to "Delete", @grape, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this grape?" } } %>
+    </div>
+  </div>
+
+  <dl class="resource-details">
+    <dt>Notes</dt>
+    <dd><%= simple_format(@grape.notes) %></dd>
+  </dl>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Synonyms</h2>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Grape</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @synonym_relationships.each do |relationship| %>
+            <% synonym = relationship.other_grape(@grape) %>
+            <tr>
+              <td><%= link_to synonym.name, synonym %> <%= community_status_tag(relationship) %></td>
+              <td><%= relationship.notes %></td>
+              <td class="actions"><%= link_to "Edit", edit_grape_synonym_path(relationship) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%= form_with model: @grape_synonym, class: "resource-form related-actions" do |form| %>
+      <%= form.hidden_field :grape_id %>
+      <div class="field">
+        <%= form.label :synonym_grape_id, "Synonym grape" %>
+        <%= form.collection_select :synonym_grape_id, @grape_options, :id, :selection_name, { prompt: "Select a grape" } %>
+      </div>
+      <div class="field">
+        <%= form.label :notes %>
+        <%= form.text_field :notes %>
+      </div>
+      <div class="form-actions">
+        <%= form.submit "Add Synonym", class: "button button--primary" %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="related-section">
+    <div class="related-section__header">
+      <h2>Allowed Appellations</h2>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Source</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @allowed_appellations.each do |appellation, source, notes| %>
+            <tr>
+              <td><%= link_to appellation.path_name, region_path(appellation) %></td>
+              <td><%= source %></td>
+              <td><%= notes %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>

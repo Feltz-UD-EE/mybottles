@@ -31,6 +31,55 @@
     <%= form.label :auto_generated, "Auto-generated" %>
   </div>
 
+  <section class="form-panel" data-controller="nested-fields">
+    <h2>Allowed Grapes</h2>
+    <div data-nested-fields-target="container">
+      <%= form.fields_for :appellation_grapes do |appellation_grape_form| %>
+        <div class="inline-fields nested-fields-row">
+          <%= appellation_grape_form.hidden_field :id %>
+          <%= appellation_grape_form.hidden_field :_destroy, data: { nested_fields_target: "destroyField" } %>
+
+          <div class="field">
+            <%= appellation_grape_form.label :grape_id, "Grape" %>
+            <%= appellation_grape_form.collection_select :grape_id, @grapes, :id, :selection_name, { include_blank: true } %>
+          </div>
+
+          <div class="field">
+            <%= appellation_grape_form.label :notes %>
+            <%= appellation_grape_form.text_field :notes %>
+          </div>
+
+          <button class="button" type="button" data-action="nested-fields#remove">Remove</button>
+        </div>
+      <% end %>
+    </div>
+
+    <template data-nested-fields-target="template">
+      <div class="inline-fields nested-fields-row">
+        <input autocomplete="off" type="hidden" value="false" name="appellation[appellation_grapes_attributes][NEW_RECORD][_destroy]" data-nested-fields-target="destroyField">
+
+        <div class="field">
+          <label for="appellation_appellation_grapes_attributes_NEW_RECORD_grape_id">Grape</label>
+          <select name="appellation[appellation_grapes_attributes][NEW_RECORD][grape_id]" id="appellation_appellation_grapes_attributes_NEW_RECORD_grape_id">
+            <option value=""></option>
+            <% @grapes.each do |grape| %>
+              <option value="<%= grape.id %>"><%= grape.selection_name %></option>
+            <% end %>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="appellation_appellation_grapes_attributes_NEW_RECORD_notes">Notes</label>
+          <input type="text" name="appellation[appellation_grapes_attributes][NEW_RECORD][notes]" id="appellation_appellation_grapes_attributes_NEW_RECORD_notes">
+        </div>
+
+        <button class="button" type="button" data-action="nested-fields#remove">Remove</button>
+      </div>
+    </template>
+
+    <button class="button" type="button" data-action="nested-fields#add">Add Grape</button>
+  </section>
+
   <div class="form-actions">
     <%= form.submit "Save", class: "button button--primary" %>
   </div>

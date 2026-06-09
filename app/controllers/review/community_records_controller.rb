@@ -36,7 +36,7 @@ module Review
 
     def set_model
       @model = params[:type].constantize
-      raise ActiveRecord::RecordNotFound unless [ Producer, Wine, Vintage ].include?(@model)
+      raise ActiveRecord::RecordNotFound unless [ Producer, Wine, Vintage, Grape, GrapeSynonym, AppellationGrape ].include?(@model)
     end
 
     def set_record
@@ -54,6 +54,10 @@ module Review
           Bottle.where(vintage: record).update_all(vintage_id: canonical.id)
           TastingNote.where(tasteable: record).update_all(tasteable_id: canonical.id)
           WatchListEntry.where(watchable: record).update_all(watchable_id: canonical.id)
+        when Grape
+          GrapeSynonym.where(grape: record).update_all(grape_id: canonical.id)
+          GrapeSynonym.where(synonym_grape: record).update_all(synonym_grape_id: canonical.id)
+          AppellationGrape.where(grape: record).update_all(grape_id: canonical.id)
         end
 
         record.update!(

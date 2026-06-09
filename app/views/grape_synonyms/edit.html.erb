@@ -1,0 +1,33 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Edit Grape Synonym</h1>
+    <%= link_to "Back to grape", @grape_synonym.grape, class: "button" %>
+  </div>
+
+  <%= render "shared/errors", resource: @grape_synonym %>
+
+  <%= form_with model: @grape_synonym, class: "resource-form" do |form| %>
+    <div class="field">
+      <%= form.label :grape_id, "Grape" %>
+      <%= form.collection_select :grape_id, Grape.visible_to(current_user).order(:name), :id, :selection_name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :synonym_grape_id, "Synonym grape" %>
+      <%= form.collection_select :synonym_grape_id, Grape.visible_to(current_user).order(:name), :id, :selection_name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :notes %>
+      <%= form.text_field :notes %>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Save", class: "button button--primary" %>
+    </div>
+  <% end %>
+
+  <div class="related-actions">
+    <%= button_to "Delete", @grape_synonym, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this synonym?" } } %>
+  </div>
+</main>

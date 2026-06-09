@@ -1,5 +1,5 @@
 class UserContributionMetrics
-  COMMUNITY_MODELS = [ Producer, Wine, Vintage ].freeze
+  COMMUNITY_MODELS = [ Producer, Wine, Vintage, Grape, GrapeSynonym, AppellationGrape ].freeze
 
   attr_reader :user
 
