@@ -10,10 +10,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "title", "My Bottles"
     assert_select "h1", "My Bottles"
     assert_select "header .site-logo[href=?]", root_path
-    assert_select "nav[aria-label='Main menu']", text: /Data/
+    assert_select "nav[aria-label='Main menu']", text: /Reference/
     assert_select "a[href=?]", public_producers_path, text: "Producers"
     assert_select "a[href=?]", public_wines_path, text: "Wines"
-    assert_select "nav[aria-label='Main menu']", text: /Geography/
     assert_select "a[href=?]", public_regions_path, text: "Regions"
     assert_select "a[href=?]", new_user_session_path, text: "Log in"
     assert_select "footer a[href=?]", about_path, text: "About"

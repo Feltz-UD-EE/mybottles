@@ -16,21 +16,29 @@
       <ul class="primary-menu__list">
         <% if user_signed_in? %>
           <li class="primary-menu__item primary-menu__item--has-children">
-            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Cellars</a>
-            <ul class="primary-menu__submenu" aria-label="Cellars submenu">
+            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">My Wine</a>
+            <ul class="primary-menu__submenu" aria-label="My Wine submenu">
               <li><%= link_to "Cellars", cellars_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Bins", bins_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Bays", bays_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Shelves", shelves_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Bottles", bottles_path, class: "primary-menu__link" %></li>
             </ul>
           </li>
+          <li class="primary-menu__item"><%= link_to "Tasting Notes", tasting_notes_path, class: "primary-menu__link" %></li>
           <li class="primary-menu__item"><%= link_to "Watch List", watch_list_entries_path, class: "primary-menu__link" %></li>
         <% end %>
         <li class="primary-menu__item primary-menu__item--has-children">
-          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Geography</a>
-          <ul class="primary-menu__submenu" aria-label="Geography submenu">
+          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Reference</a>
+          <ul class="primary-menu__submenu" aria-label="Reference submenu">
             <li><%= link_to "Countries", user_signed_in? ? countries_path : public_regions_path, class: "primary-menu__link" %></li>
             <li><%= link_to "Regions", user_signed_in? ? regions_path : public_regions_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Producers", user_signed_in? ? producers_path : public_producers_path, class: "primary-menu__link" %></li>
+            <li><%= link_to "Wines", user_signed_in? ? wines_path : public_wines_path, class: "primary-menu__link" %></li>
+            <% if user_signed_in? %>
+              <li><%= link_to "Vintages", vintages_path, class: "primary-menu__link" %></li>
+              <li><%= link_to "Grapes", grapes_path, class: "primary-menu__link" %></li>
+            <% end %>
           </ul>
         </li>
         <% if user_signed_in? %>
@@ -39,28 +47,14 @@
             <ul class="primary-menu__submenu" aria-label="Clubs submenu">
               <li><%= link_to "Current", wine_clubs_path, class: "primary-menu__link" %></li>
               <li><%= link_to "All", all_wine_clubs_path, class: "primary-menu__link" %></li>
-              <li><%= link_to "New", new_wine_club_path, class: "primary-menu__link" %></li>
             </ul>
           </li>
         <% end %>
-        <li class="primary-menu__item primary-menu__item--has-children">
-          <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Data</a>
-          <ul class="primary-menu__submenu" aria-label="Data submenu">
-            <li><%= link_to "Producers", user_signed_in? ? producers_path : public_producers_path, class: "primary-menu__link" %></li>
-            <li><%= link_to "Wines", user_signed_in? ? wines_path : public_wines_path, class: "primary-menu__link" %></li>
-            <% if user_signed_in? %>
-              <li><%= link_to "Vintages", vintages_path, class: "primary-menu__link" %></li>
-              <li><%= link_to "Grapes", grapes_path, class: "primary-menu__link" %></li>
-              <li><%= link_to "Bottles", bottles_path, class: "primary-menu__link" %></li>
-              <li><%= link_to "Tasting Notes", tasting_notes_path, class: "primary-menu__link" %></li>
-            <% end %>
-          </ul>
-        </li>
         <% if reviewer? %>
-          <li class="primary-menu__item"><%= link_to "Review", review_root_path, class: "primary-menu__link" %></li>
           <li class="primary-menu__item primary-menu__item--has-children">
-            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">User Review</a>
-            <ul class="primary-menu__submenu" aria-label="User Review submenu">
+            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Review</a>
+            <ul class="primary-menu__submenu" aria-label="Review submenu">
+              <li><%= link_to "Review Queue", review_root_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Trusted Users", user_review_trusted_users_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Basic Users", user_review_basic_users_path, class: "primary-menu__link" %></li>
               <li><%= link_to "Stats", user_review_stats_path, class: "primary-menu__link" %></li>
@@ -71,11 +65,16 @@
           </li>
         <% end %>
         <% if user_signed_in? %>
-          <li class="primary-menu__item"><%= link_to "My profile", profile_path, class: "primary-menu__link" %></li>
-          <% if system_administrator? %>
-            <li class="primary-menu__item"><%= link_to "Invite User", new_invitation_path, class: "primary-menu__link" %></li>
-          <% end %>
-          <li class="primary-menu__item"><%= button_to "Log out", destroy_user_session_path, method: :delete, class: "primary-menu__link" %></li>
+          <li class="primary-menu__item primary-menu__item--has-children primary-menu__item--align-right">
+            <a class="primary-menu__link" href="#" data-action="click->menu#ignorePlaceholder">Account</a>
+            <ul class="primary-menu__submenu" aria-label="Account submenu">
+              <li><%= link_to "My profile", profile_path, class: "primary-menu__link" %></li>
+              <% if reviewer? %>
+                <li><%= link_to "Invite User", new_invitation_path, class: "primary-menu__link" %></li>
+              <% end %>
+              <li><%= button_to "Log out", destroy_user_session_path, method: :delete, class: "primary-menu__link" %></li>
+            </ul>
+          </li>
         <% else %>
           <li class="primary-menu__item"><%= link_to "Log in", new_user_session_path, class: "primary-menu__link" %></li>
         <% end %>

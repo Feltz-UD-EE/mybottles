@@ -170,6 +170,11 @@ a {
   box-shadow: var(--shadow-soft);
 }
 
+.primary-menu__item--align-right .primary-menu__submenu {
+  right: 0;
+  left: auto;
+}
+
 .primary-menu__submenu .primary-menu__link {
   display: block;
 }
