@@ -301,7 +301,7 @@ Seed instructions:
 
 Recommended seed organization:
 
-* `db/seeds/grapes.rb` for grapes.
+* `db/seeds/grape_varieties/` for grape review files, including `world.rb` for broad cross-country seed entries.
 * `db/seeds/grape_synonyms.rb` for synonym relationships.
 * `db/seeds/appellation_grapes/` with one file per country or other manageable grouping.
 

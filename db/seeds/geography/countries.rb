@@ -15,6 +15,7 @@ seed_countries([
   { name: "Italy", fullname: "Italian Republic", iso2: "IT", iso3: "ITA" },
   { name: "Hungary", fullname: "Hungary", iso2: "HU", iso3: "HUN" },
   { name: "Austria", fullname: "Republic of Austria", iso2: "AT", iso3: "AUT" },
+  { name: "Greece", fullname: "Hellenic Republic", iso2: "GR", iso3: "GRC" },
   { name: "Romania", fullname: "Romania", iso2: "RO", iso3: "ROU" },
   { name: "Moldova", fullname: "Republic of Moldova", iso2: "MD", iso3: "MDA" },
   { name: "Georgia", fullname: "Georgia", iso2: "GE", iso3: "GEO" },
