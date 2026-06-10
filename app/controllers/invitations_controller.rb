@@ -1,5 +1,5 @@
 class InvitationsController < ApplicationController
-  before_action :authorize_system_administrator
+  before_action :authorize_reviewer
 
   def new
     @user = User.new(trust_level: "Basic")
@@ -17,8 +17,8 @@ class InvitationsController < ApplicationController
 
   private
 
-  def authorize_system_administrator
-    authorize :system_administrator, :create?
+  def authorize_reviewer
+    authorize :reviewer, :create?
   end
 
   def invite_params

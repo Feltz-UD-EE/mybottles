@@ -16,4 +16,64 @@
     <dt>Print labels by default</dt>
     <dd><%= @user.print_labels_by_default? ? "Yes" : "No" %></dd>
   </dl>
+
+  <section class="related-section">
+    <h2>Pending Invitations</h2>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Date invite sent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @pending_invitations.any? %>
+            <% @pending_invitations.each do |invitation| %>
+              <tr>
+                <td><%= invitation.email %></td>
+                <td><%= invitation.invitation_sent_at&.to_date&.iso8601 %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="2"></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="related-section">
+    <h2>Accepted Invitations</h2>
+
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Date account created</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @accepted_invitations.any? %>
+            <% @accepted_invitations.each do |invitation| %>
+              <tr>
+                <td><%= invitation.name %></td>
+                <td><%= invitation.email %></td>
+                <td><%= invitation.created_at&.to_date&.iso8601 %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="3"></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </main>
