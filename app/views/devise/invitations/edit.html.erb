@@ -3,6 +3,8 @@
     <h1>Accept invitation</h1>
   </div>
 
+  <%= render "shared/errors", resource: resource %>
+
   <%= form_with model: resource, as: resource_name, url: invitation_path(resource_name), method: :put, class: "resource-form" do |form| %>
     <%= form.hidden_field :invitation_token, readonly: true %>
 

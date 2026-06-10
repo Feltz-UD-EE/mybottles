@@ -1,8 +1,16 @@
 <% if resource.errors.any? %>
   <div class="error-messages">
-    <h2><%= pluralize(resource.errors.count, "error") %> prevented this record from being saved</h2>
     <ul>
-      <% resource.errors.full_messages.each do |message| %>
+      <% resource.errors.each do |error| %>
+        <% message =
+          if resource.is_a?(User) && error.attribute == :password && error.type == :too_short
+            "Password is too short (#{error.options[:count]} characters minimum)"
+          elsif resource.is_a?(User) && error.attribute == :password_confirmation && error.type == :confirmation
+            "Password confirmation didn't match password"
+          else
+            error.full_message
+          end
+        %>
         <li><%= message %></li>
       <% end %>
     </ul>
