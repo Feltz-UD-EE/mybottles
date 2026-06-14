@@ -59,7 +59,8 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-controller='print-page']"
-    assert_select ".bottle-label__brand", text: /My Bottles/
+    assert_select ".bottle-label__brand", text: /mybottles\.tech/
+    assert_select ".bottle-label__qr[aria-label=?]", "QR code for https://mybottles.tech/bottles/#{bottle.id}"
     assert_select ".bottle-label__inventory", "A-001"
     assert_includes response.body, "bottle-label__qr"
     assert_includes response.body, "<svg"
@@ -72,8 +73,8 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     get label_bottle_url(bottle)
 
     assert_response :success
-    assert_equal "0001", bottle.reload.auto_inventory
-    assert_select ".bottle-label__inventory", "0001"
+    assert_equal "000001", bottle.reload.auto_inventory
+    assert_select ".bottle-label__inventory", "000-001"
   end
 
   test "label renders personal inventory instead of generated inventory when both exist" do
@@ -83,9 +84,9 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     get label_bottle_url(bottle)
 
     assert_response :success
-    assert_equal "0001", bottle.reload.auto_inventory
+    assert_equal "000001", bottle.reload.auto_inventory
     assert_select ".bottle-label__inventory", "A-001"
-    assert_select ".bottle-label__inventory", { text: "0001", count: 0 }
+    assert_select ".bottle-label__inventory", { text: "000-001", count: 0 }
   end
 
   test "new preloads vintage from params" do
@@ -137,7 +138,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
 
     bottle = Bottle.order(:created_at).last
     assert_redirected_to bottle_url(bottle, print_label: false)
-    assert_equal "0001", bottle.auto_inventory
-    assert_equal "0001", bottle.inventory_code
+    assert_equal "000001", bottle.auto_inventory
+    assert_equal "000-001", bottle.inventory_code
   end
 end

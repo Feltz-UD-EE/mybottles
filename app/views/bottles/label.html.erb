@@ -7,12 +7,12 @@
       <span><%= @label_app_name %></span>
     </div>
 
-    <div class="bottle-label__qr"><%= raw @qr_svg %></div>
+    <div class="bottle-label__qr" aria-label="QR code for <%= @label_url %>"><%= raw @qr_svg %></div>
 
     <% if @bottle.personal_inventory.present? %>
       <div class="bottle-label__inventory"><%= @bottle.personal_inventory %></div>
     <% elsif @bottle.auto_inventory.present? %>
-      <div class="bottle-label__inventory"><%= @bottle.auto_inventory %></div>
+      <div class="bottle-label__inventory"><%= @bottle.auto_inventory_display %></div>
     <% end %>
   </section>
 </main>

@@ -43,9 +43,11 @@ class BottleTest < ActiveSupport::TestCase
     first_bottle = Bottle.create!(vintage: vintage)
     second_bottle = Bottle.create!(personal_inventory: "", vintage: vintage)
 
-    assert_equal "0001", first_bottle.auto_inventory
-    assert_equal "0001", first_bottle.inventory_code
-    assert_equal "0002", second_bottle.auto_inventory
+    assert_equal "000001", first_bottle.auto_inventory
+    assert_equal "000-001", first_bottle.inventory_code
+    assert_equal "000001", first_bottle.auto_inventory_display.delete("-")
+    assert_equal "000002", second_bottle.auto_inventory
+    assert_equal "000-002", second_bottle.auto_inventory_display
     assert_equal 3, admin_user.reload.next_auto_inventory_number
   end
 

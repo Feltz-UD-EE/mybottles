@@ -49,6 +49,6 @@ class AddAutoInventoryToBottles < ActiveRecord::Migration[8.0]
   end
 
   def auto_inventory_code(number)
-    number.to_i.to_s(36).upcase.rjust(4, "0")
+    number.to_i.to_s(36).upcase.rjust(6, "0")
   end
 end

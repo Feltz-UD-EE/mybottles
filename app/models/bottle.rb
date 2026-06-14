@@ -37,7 +37,14 @@ class Bottle < ApplicationRecord
   end
 
   def inventory_code
-    personal_inventory.presence || auto_inventory
+    personal_inventory.presence || auto_inventory_display
+  end
+
+  def auto_inventory_display
+    return if auto_inventory.blank?
+
+    code = auto_inventory.rjust(6, "0")
+    "#{code.first(3)}-#{code.last(3)}"
   end
 
   def location_name
@@ -74,7 +81,7 @@ class Bottle < ApplicationRecord
   end
 
   def auto_inventory_code(number)
-    number.to_i.to_s(36).upcase.rjust(4, "0")
+    number.to_i.to_s(36).upcase.rjust(6, "0")
   end
 
   def disposal_date_must_not_be_before_purchase_date
