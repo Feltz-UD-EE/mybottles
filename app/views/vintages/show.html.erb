@@ -40,7 +40,7 @@
         <tbody>
           <% @bottles.each do |bottle| %>
             <tr>
-              <td><%= link_to bottle.personal_inventory, bottle %></td>
+              <td><%= link_to bottle.inventory_code, bottle %></td>
               <td><%= bottle.purchase_date&.iso8601 %></td>
               <td><%= bottle.purchase_source %></td>
               <td><%= number_to_currency(bottle.list_price) if bottle.list_price.present? %></td>

@@ -2,18 +2,22 @@ class Bottle < ApplicationRecord
   include OwnedByUser
 
   DISPOSAL_METHODS = %w[Drink Gift Sale Spoiled].freeze
+  AUTO_INVENTORY_FORMAT = /\A[A-Z0-9]+\z/
 
   belongs_to :vintage
   belongs_to :cellarable, polymorphic: true, optional: true
   has_many :tasting_notes, as: :tasteable, dependent: :restrict_with_error
 
   before_validation :normalize_blank_disposal_method
+  before_validation :assign_auto_inventory
 
   scope :in_inventory, -> { where(disposal_date: nil) }
 
   validates :list_price, :discount_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :disposal_method, inclusion: { in: DISPOSAL_METHODS }, allow_blank: true
   validates :cellarable_type, inclusion: { in: %w[Cellar Bin Shelf] }, allow_blank: true
+  validates :auto_inventory, format: { with: AUTO_INVENTORY_FORMAT }, allow_blank: true
+  validates :auto_inventory, uniqueness: { scope: :user_id }, allow_blank: true
   validate :disposal_date_must_not_be_before_purchase_date
 
   def in_inventory?
@@ -21,7 +25,7 @@ class Bottle < ApplicationRecord
   end
 
   def to_s
-    [ personal_inventory, vintage.to_s ].compact_blank.join(" - ")
+    [ inventory_code, vintage.to_s ].compact_blank.join(" - ")
   end
 
   def display_name
@@ -29,7 +33,11 @@ class Bottle < ApplicationRecord
   end
 
   def inventory_display_name
-    [ personal_inventory, display_name ].compact_blank.join(" - ")
+    [ inventory_code, display_name ].compact_blank.join(" - ")
+  end
+
+  def inventory_code
+    personal_inventory.presence || auto_inventory
   end
 
   def location_name
@@ -46,6 +54,27 @@ class Bottle < ApplicationRecord
 
   def normalize_blank_disposal_method
     self.disposal_method = nil if disposal_method.blank?
+  end
+
+  def assign_auto_inventory
+    return if personal_inventory.present? || auto_inventory.present? || user.blank?
+
+    user.with_lock do
+      loop do
+        code = auto_inventory_code(user.next_auto_inventory_number)
+        user.next_auto_inventory_number += 1
+        user.save!
+
+        unless self.class.where(user: user, auto_inventory: code).where.not(id: id).exists?
+          self.auto_inventory = code
+          break
+        end
+      end
+    end
+  end
+
+  def auto_inventory_code(number)
+    number.to_i.to_s(36).upcase.rjust(4, "0")
   end
 
   def disposal_date_must_not_be_before_purchase_date

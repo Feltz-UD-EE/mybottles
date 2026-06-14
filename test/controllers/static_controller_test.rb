@@ -33,6 +33,6 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Signup"
     assert_select "p", text: /closed beta/
-    assert_select ".placeholder-text", "interest@example.com"
+    assert_select ".placeholder-text", "info@mybottles.tech"
   end
 end

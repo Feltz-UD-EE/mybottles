@@ -28,7 +28,7 @@
         <tbody>
           <% @bottles.each do |bottle| %>
             <tr data-table-target="row">
-              <td data-table-sort-value="inventory"><%= bottle.personal_inventory %></td>
+              <td data-table-sort-value="inventory"><%= bottle.inventory_code %></td>
               <td data-table-sort-value="wine">
                 <%= link_to "#{bottle.vintage.wine.producer.name} - #{bottle.vintage.wine.name} - #{bottle.vintage.vintage}", bottle.vintage %>
               </td>

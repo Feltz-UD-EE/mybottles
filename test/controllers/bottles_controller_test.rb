@@ -66,6 +66,28 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "viewBox="
   end
 
+  test "label renders generated inventory when personal inventory is blank" do
+    bottle = Bottle.create!(vintage: @vintage, disposal_method: "Drink")
+
+    get label_bottle_url(bottle)
+
+    assert_response :success
+    assert_equal "0001", bottle.reload.auto_inventory
+    assert_select ".bottle-label__inventory", "0001"
+  end
+
+  test "label renders personal inventory instead of generated inventory when both exist" do
+    bottle = Bottle.create!(vintage: @vintage, disposal_method: "Drink")
+    bottle.update!(personal_inventory: "A-001")
+
+    get label_bottle_url(bottle)
+
+    assert_response :success
+    assert_equal "0001", bottle.reload.auto_inventory
+    assert_select ".bottle-label__inventory", "A-001"
+    assert_select ".bottle-label__inventory", { text: "0001", count: 0 }
+  end
+
   test "new preloads vintage from params" do
     alpha_producer = Producer.create!(name: "Alpha Producer")
     alpha_wine = Wine.create!(name: "Alpha Wine", producer: alpha_producer)
@@ -106,5 +128,16 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
       delete bottle_url(bottle)
     end
     assert_redirected_to bottles_url
+  end
+
+  test "creates bottle with generated inventory when personal inventory is blank" do
+    assert_difference("Bottle.count", 1) do
+      post bottles_url, params: { bottle: { personal_inventory: "", vintage_id: @vintage.id, purchase_date: "2026-06-06" } }
+    end
+
+    bottle = Bottle.order(:created_at).last
+    assert_redirected_to bottle_url(bottle, print_label: false)
+    assert_equal "0001", bottle.auto_inventory
+    assert_equal "0001", bottle.inventory_code
   end
 end

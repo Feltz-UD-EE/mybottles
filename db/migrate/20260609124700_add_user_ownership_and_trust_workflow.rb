@@ -64,11 +64,7 @@ class AddUserOwnershipAndTrustWorkflow < ActiveRecord::Migration[8.0]
     existing_id = select_value("SELECT id FROM users WHERE email = #{quote(email)}")
     return existing_id.tap { |id| execute "UPDATE users SET trust_level = 'System Administrator' WHERE id = #{quote(id)}" } if existing_id.present?
 
-    password = ENV["MYBOTTLES_SYSTEM_ADMIN_PASSWORD"]
-    if password.blank? && Rails.env.development?
-      password = "Bottle4Bottle"
-    end
-    raise "MYBOTTLES_SYSTEM_ADMIN_PASSWORD must be set" if password.blank?
+    password = system_administrator_password
 
     id = select_value("SELECT gen_random_uuid()")
     encrypted_password = BCrypt::Password.create(password)
@@ -78,5 +74,13 @@ class AddUserOwnershipAndTrustWorkflow < ActiveRecord::Migration[8.0]
       VALUES (#{quote(id)}, #{quote(email)}, #{quote(encrypted_password)}, 'System Administrator', 'System', false, #{now}, #{now})
     SQL
     id
+  end
+
+  def system_administrator_password
+    password = ENV["MYBOTTLES_SYSTEM_ADMIN_PASSWORD"]
+    return password if password.present?
+    return "Bottle4Bottle" if Rails.env.development? || Rails.env.test?
+
+    raise "MYBOTTLES_SYSTEM_ADMIN_PASSWORD must be set"
   end
 end

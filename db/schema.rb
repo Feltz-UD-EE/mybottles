@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_09_190000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_14_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -106,7 +106,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_190000) do
     t.string "cellarable_type"
     t.uuid "cellarable_id", comment: "Where this bottle is cellared"
     t.uuid "user_id", null: false, comment: "The user who owns this record"
+    t.text "auto_inventory", comment: "System-generated bottle inventory code used when no personal inventory code is provided"
     t.index ["cellarable_type", "cellarable_id"], name: "index_bottles_on_cellarable"
+    t.index ["user_id", "auto_inventory"], name: "index_bottles_on_user_id_and_auto_inventory", unique: true, where: "(auto_inventory IS NOT NULL)"
     t.index ["user_id"], name: "index_bottles_on_user_id"
     t.index ["vintage_id"], name: "index_bottles_on_vintage_id"
     t.check_constraint "cellarable_type IS NULL OR (cellarable_type::text = ANY (ARRAY['Cellar'::character varying, 'Bin'::character varying, 'Shelf'::character varying]::text[]))", name: "chk_bottles_cellarable_type"
@@ -305,6 +307,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_190000) do
     t.string "invited_by_type"
     t.uuid "invited_by_id"
     t.integer "invitations_count", default: 0
+    t.integer "next_auto_inventory_number", default: 1, null: false, comment: "Next sequential number to use when generating a bottle auto-inventory code"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"

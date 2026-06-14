@@ -35,6 +35,30 @@ class BottleTest < ActiveSupport::TestCase
     assert_equal "A-001 - Estate Red 2024", bottle.to_s
   end
 
+  test "generates auto inventory when personal inventory is blank" do
+    producer = Producer.create!(name: "Producer")
+    wine = Wine.create!(name: "Estate Red", producer: producer)
+    vintage = Vintage.create!(vintage: "2024", wine: wine)
+
+    first_bottle = Bottle.create!(vintage: vintage)
+    second_bottle = Bottle.create!(personal_inventory: "", vintage: vintage)
+
+    assert_equal "0001", first_bottle.auto_inventory
+    assert_equal "0001", first_bottle.inventory_code
+    assert_equal "0002", second_bottle.auto_inventory
+    assert_equal 3, admin_user.reload.next_auto_inventory_number
+  end
+
+  test "uses personal inventory before generated inventory for display" do
+    producer = Producer.create!(name: "Producer")
+    wine = Wine.create!(name: "Estate Red", producer: producer)
+    vintage = Vintage.create!(vintage: "2024", wine: wine)
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: vintage)
+
+    assert_nil bottle.auto_inventory
+    assert_equal "A-001", bottle.inventory_code
+  end
+
   test "tracks inventory status from disposal date" do
     producer = Producer.create!(name: "Producer")
     wine = Wine.create!(name: "Estate Red", producer: producer)

@@ -9,7 +9,7 @@ class VintagesController < ApplicationController
 
   def show
     @pending_changes = ProposedChange.pending.for_target(@vintage).where(proposed_by_user: current_user)
-    @bottles = @vintage.bottles.visible_to(current_user).order(:purchase_date, :personal_inventory)
+    @bottles = @vintage.bottles.visible_to(current_user).order(:purchase_date, :personal_inventory, :auto_inventory)
   end
 
   def new

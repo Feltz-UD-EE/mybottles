@@ -23,5 +23,8 @@ module Mybottles
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    config.x.app_urls = ActiveSupport::OrderedOptions.new
+    config.x.app_urls.host = "mybottles.tech"
+    config.x.app_urls.base_url = "https://mybottles.tech"
   end
 end

@@ -11,6 +11,8 @@
 
     <% if @bottle.personal_inventory.present? %>
       <div class="bottle-label__inventory"><%= @bottle.personal_inventory %></div>
+    <% elsif @bottle.auto_inventory.present? %>
+      <div class="bottle-label__inventory"><%= @bottle.auto_inventory %></div>
     <% end %>
   </section>
 </main>

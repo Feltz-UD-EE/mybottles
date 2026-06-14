@@ -2,6 +2,8 @@ class User < ApplicationRecord
   TRUST_LEVELS = [ "Basic", "Trusted", "Curator", "System Administrator" ].freeze
   THEME_PREFERENCES = [ "Light", "Dark", "System" ].freeze
   SYSTEM_ADMIN_EMAIL = "johncfeltz@gmail.com"
+  SYSTEM_ADMIN_PASSWORD_ENV = "MYBOTTLES_SYSTEM_ADMIN_PASSWORD"
+  DEVELOPMENT_SYSTEM_ADMIN_PASSWORD = "Bottle4Bottle"
 
   devise :invitable, :database_authenticatable, :recoverable, :rememberable,
     :trackable, :validatable
@@ -26,9 +28,7 @@ class User < ApplicationRecord
   end
 
   def self.bootstrap_system_administrator!(reset_password: false)
-    password = ENV["MYBOTTLES_SYSTEM_ADMIN_PASSWORD"].presence
-    password ||= "Bottle4Bottle" if Rails.env.development? || Rails.env.test?
-    raise "MYBOTTLES_SYSTEM_ADMIN_PASSWORD must be set" if password.blank?
+    password = system_administrator_password
 
     user = find_or_initialize_by(email: SYSTEM_ADMIN_EMAIL)
     user.trust_level = "System Administrator"
@@ -40,6 +40,14 @@ class User < ApplicationRecord
     user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
     user.save!
     user
+  end
+
+  def self.system_administrator_password
+    password = ENV[SYSTEM_ADMIN_PASSWORD_ENV].presence
+    return password if password.present?
+    return DEVELOPMENT_SYSTEM_ADMIN_PASSWORD if Rails.env.development? || Rails.env.test?
+
+    raise "#{SYSTEM_ADMIN_PASSWORD_ENV} must be set"
   end
 
   def basic?
@@ -88,6 +96,7 @@ class User < ApplicationRecord
     self.trust_level ||= "Basic"
     self.theme_preference ||= "System"
     self.print_labels_by_default = false if print_labels_by_default.nil?
+    self.next_auto_inventory_number ||= 1
   end
 
   def change_trust_level!(actor, target_level, action)
