@@ -13,6 +13,10 @@ module ApplicationHelper
     content_tag(:span, "Your edit is awaiting review", class: "status-tag status-tag--pending")
   end
 
+  def tasted_checkmark
+    content_tag(:span, "✓", class: "tasted-checkmark", role: "img", aria: { label: "Tasted" })
+  end
+
   def review_record_path(record)
     case record
     when Producer then review_producer_path(record)

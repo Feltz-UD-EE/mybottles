@@ -11,6 +11,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     cellar = Cellar.create!(name: "Main")
     bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink", cellarable: cellar)
     newer_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage, purchase_date: Date.new(2026, 6, 7), disposal_method: "Drink")
+    TastingNote.create!(tasteable: bottle, date: Date.new(2026, 6, 8), overall: "Bright")
 
     get bottles_url
 
@@ -23,6 +24,8 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", "Main"
     assert_select "td", "Not Cellared"
     assert_select "tbody tr:first-child td:first-child", "A-002"
+    assert_select "th", "Tasted"
+    assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: newer_bottle.id }), text: "Tasted This"
@@ -41,6 +44,31 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", label_bottle_path(bottle), text: "Print labels"
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
+  end
+
+  test "show lists tasting notes for same vintage by date descending" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+    other_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage, disposal_method: "Drink")
+    other_vintage = Vintage.create!(vintage: "2023", wine: @vintage.wine)
+    other_vintage_bottle = Bottle.create!(personal_inventory: "B-001", vintage: other_vintage, disposal_method: "Drink")
+    older_note = TastingNote.create!(tasteable: bottle, date: Date.new(2026, 6, 1), overall: "Current bottle note")
+    newer_note = TastingNote.create!(tasteable: other_bottle, date: Date.new(2026, 6, 3), overall: "Other bottle note")
+    vintage_note = TastingNote.create!(tasteable: @vintage, date: Date.new(2026, 6, 2), overall: "Vintage note")
+    TastingNote.create!(tasteable: other_vintage_bottle, date: Date.new(2026, 6, 4), overall: "Wrong vintage note")
+
+    get bottle_url(bottle)
+
+    assert_response :success
+    assert_select "h2", "Tasting Notes"
+    assert_select "a[href=?]", tasting_note_path(older_note), text: "Show"
+    assert_select "a[href=?]", tasting_note_path(newer_note), text: "Show"
+    assert_select "a[href=?]", tasting_note_path(vintage_note), text: "Show"
+    assert_select "td", text: "Wrong vintage note", count: 0
+    assert_operator response.body.index("Other bottle note"), :<, response.body.index("Vintage note")
+    assert_operator response.body.index("Vintage note"), :<, response.body.index("Current bottle note")
+    assert_select "td", "This bottle (A-001)"
+    assert_select "td", "Bottle A-002"
+    assert_select "td", "Vintage 2024"
   end
 
   test "show auto print hook is present when redirected after create" do

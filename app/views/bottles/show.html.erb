@@ -41,4 +41,6 @@
     <dt>In inventory</dt>
     <dd><%= @bottle.in_inventory? ? "Yes" : "No" %></dd>
   </dl>
+
+  <%= render "tasting_notes/related_table", tasting_notes: @tasting_notes, context_bottle: @bottle %>
 </main>

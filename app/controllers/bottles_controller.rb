@@ -4,12 +4,14 @@ class BottlesController < ApplicationController
 
   def index
     @bottles = Bottle.visible_to(current_user).includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
+    @tasted_bottle_ids = tasted_bottle_ids(@bottles)
   end
 
   def show
     @vintage = @bottle.vintage
     @wine = @vintage.wine
     @producer = @wine.producer
+    @tasting_notes = @bottle.tasting_notes_for_same_vintage
   end
 
   def label
@@ -80,6 +82,15 @@ class BottlesController < ApplicationController
 
   def bottle_params
     params.expect(bottle: %i[ personal_inventory vintage_id purchase_date purchase_source list_price discount_price notes disposal_date disposal_method cellarable_selection ])
+  end
+
+  def tasted_bottle_ids(bottles)
+    TastingNote
+      .visible_to(current_user)
+      .where(tasteable_type: "Bottle", tasteable_id: bottles.select(:id))
+      .distinct
+      .pluck(:tasteable_id)
+      .to_set
   end
 
   def load_cellarable_options

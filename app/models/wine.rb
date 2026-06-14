@@ -23,6 +23,14 @@ class Wine < ApplicationRecord
     [ producer.name, name ].compact_blank.join(" - ")
   end
 
+  def tasting_notes_for_wine(user)
+    TastingNote.for_wine(self, user)
+  end
+
+  def tasted?(user)
+    tasting_notes_for_wine(user).any?
+  end
+
   private
 
   def producer_id_cannot_change

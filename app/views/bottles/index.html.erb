@@ -22,6 +22,7 @@
             <th>List Price</th>
             <th>Discount Price</th>
             <th>In Inventory</th>
+            <th>Tasted</th>
             <th></th>
           </tr>
         </thead>
@@ -38,6 +39,7 @@
               <td><%= number_to_currency(bottle.list_price) if bottle.list_price.present? %></td>
               <td><%= number_to_currency(bottle.discount_price) if bottle.discount_price.present? %></td>
               <td><%= bottle.in_inventory? ? "Yes" : "No" %></td>
+              <td><%= tasted_checkmark if @tasted_bottle_ids.include?(bottle.id) %></td>
               <td class="actions">
                 <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: bottle.vintage_id }) %>
                 <%= link_to "Tasted This", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }) %>

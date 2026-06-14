@@ -50,4 +50,6 @@
       <%= link_to "New Vintage", new_vintage_path(vintage: { wine_id: @wine.id }), class: "button button--primary" %>
     </div>
   </section>
+
+  <%= render "tasting_notes/related_table", tasting_notes: @tasting_notes, show_vintage: true %>
 </main>

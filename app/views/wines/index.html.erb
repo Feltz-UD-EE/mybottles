@@ -19,6 +19,7 @@
             <th>Style</th>
             <th>Color</th>
             <th>Appellation</th>
+            <th>Tasted</th>
             <th></th>
           </tr>
         </thead>
@@ -30,6 +31,7 @@
               <td><%= wine.style %></td>
               <td><%= wine.color %></td>
               <td><%= wine.appellation %></td>
+              <td><%= tasted_checkmark if @tasted_wine_ids.include?(wine.id) %></td>
               <td class="actions">
                 <%= link_to "Add to Watch List", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Wine", watchable_id: wine.id }) %>
                 <%= link_to "Edit", edit_wine_path(wine) %>

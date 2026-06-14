@@ -355,6 +355,11 @@ a {
   color: #2f6f44;
 }
 
+.tasted-checkmark {
+  color: #16803a;
+  font-weight: 800;
+}
+
 .splash {
   display: grid;
   gap: 12px;

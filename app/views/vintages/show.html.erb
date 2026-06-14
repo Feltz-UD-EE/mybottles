@@ -56,4 +56,6 @@
       <%= link_to "New Bottle", new_bottle_path(bottle: { vintage_id: @vintage.id }), class: "button button--primary" %>
     </div>
   </section>
+
+  <%= render "tasting_notes/related_table", tasting_notes: @tasting_notes, show_vintage: true %>
 </main>

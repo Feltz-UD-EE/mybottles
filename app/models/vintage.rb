@@ -19,4 +19,12 @@ class Vintage < ApplicationRecord
   def selection_name
     "#{wine.display_name} (#{vintage})"
   end
+
+  def tasting_notes_for_wine(user)
+    TastingNote.for_wine(wine, user)
+  end
+
+  def tasted?(user)
+    TastingNote.for_vintage(self, user).exists?
+  end
 end

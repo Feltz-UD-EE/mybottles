@@ -36,6 +36,14 @@ class Bottle < ApplicationRecord
     [ inventory_code, display_name ].compact_blank.join(" - ")
   end
 
+  def tasting_notes_for_same_vintage
+    TastingNote.for_vintage(vintage, user)
+  end
+
+  def tasted?
+    tasting_notes.exists?
+  end
+
   def inventory_code
     personal_inventory.presence || auto_inventory_display
   end

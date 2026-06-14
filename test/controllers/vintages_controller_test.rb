@@ -7,7 +7,8 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "lists vintages with dynamic table UI" do
-    Vintage.create!(vintage: "2024", wine: @wine, grapes: "Cabernet Sauvignon")
+    vintage = Vintage.create!(vintage: "2024", wine: @wine, grapes: "Cabernet Sauvignon")
+    TastingNote.create!(tasteable: vintage, date: Date.new(2026, 6, 8), overall: "Bright")
 
     get vintages_url
 
@@ -17,6 +18,8 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "tbody tr:first-child td:first-child", "Producer"
     assert_select "tbody tr:first-child td:nth-child(2)", "Estate Red"
     assert_select "a[href=?]", vintage_path(Vintage.last), "2024"
+    assert_select "th", "Tasted"
+    assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: Vintage.last.id }), text: "Add to Watch List"
   end
 
@@ -62,5 +65,29 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", "Bottles Purchased"
     assert_select "a[href=?]", bottle_path(bottle), "A-001"
     assert_select "a[href=?]", new_bottle_path(bottle: { vintage_id: vintage.id }), text: "New Bottle"
+  end
+
+  test "show lists tasting notes across all vintages for the wine" do
+    vintage_2023 = Vintage.create!(vintage: "2023", wine: @wine)
+    vintage_2024 = Vintage.create!(vintage: "2024", wine: @wine)
+    bottle_2023 = Bottle.create!(personal_inventory: "A-023", vintage: vintage_2023)
+    bottle_2024 = Bottle.create!(personal_inventory: "A-024", vintage: vintage_2024)
+    other_wine = Wine.create!(name: "Other Wine", producer: @wine.producer)
+    other_vintage = Vintage.create!(vintage: "2025", wine: other_wine)
+    TastingNote.create!(tasteable: bottle_2023, date: Date.new(2026, 6, 1), overall: "Older vintage bottle")
+    TastingNote.create!(tasteable: vintage_2024, date: Date.new(2026, 6, 2), overall: "Newer vintage note")
+    TastingNote.create!(tasteable: bottle_2024, date: Date.new(2026, 6, 3), overall: "Newer vintage bottle")
+    TastingNote.create!(tasteable: other_vintage, date: Date.new(2026, 6, 4), overall: "Other wine note")
+
+    get vintage_url(vintage_2023)
+
+    assert_response :success
+    assert_select "h2", "Tasting Notes"
+    assert_select "td", "Older vintage bottle"
+    assert_select "td", "Newer vintage note"
+    assert_select "td", "Newer vintage bottle"
+    assert_select "td", text: "Other wine note", count: 0
+    assert_operator response.body.index("Newer vintage bottle"), :<, response.body.index("Newer vintage note")
+    assert_operator response.body.index("Newer vintage note"), :<, response.body.index("Older vintage bottle")
   end
 end

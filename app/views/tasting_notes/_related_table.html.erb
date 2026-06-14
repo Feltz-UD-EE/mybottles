@@ -1,0 +1,43 @@
+<% show_vintage = local_assigns.fetch(:show_vintage, false) %>
+<% context_bottle = local_assigns[:context_bottle] %>
+
+<section class="related-section">
+  <h2>Tasting Notes</h2>
+
+  <% if tasting_notes.any? %>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <% if show_vintage %>
+              <th>Vintage</th>
+            <% end %>
+            <th>Date</th>
+            <th>Attachment</th>
+            <th>Overall</th>
+            <th>Score</th>
+            <th>Buy</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% tasting_notes.each do |tasting_note| %>
+            <tr>
+              <% if show_vintage %>
+                <td><%= link_to tasting_note.vintage.vintage, tasting_note.vintage %></td>
+              <% end %>
+              <td><%= tasting_note.date&.iso8601 %></td>
+              <td><%= tasting_note.attachment_name(context_bottle: context_bottle) %></td>
+              <td><%= tasting_note.overall %></td>
+              <td><%= tasting_note.score %></td>
+              <td><%= tasting_note.buy_label %></td>
+              <td class="actions"><%= link_to "Show", tasting_note %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="empty-state">No tasting notes yet.</p>
+  <% end %>
+</section>
