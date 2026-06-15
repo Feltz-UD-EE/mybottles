@@ -15,7 +15,7 @@
             <th>Date</th>
             <th>Attachment</th>
             <th>Overall</th>
-            <th>Score</th>
+            <th>Rating</th>
             <th>Buy</th>
             <th></th>
           </tr>
@@ -29,7 +29,7 @@
               <td><%= tasting_note.date&.iso8601 %></td>
               <td><%= tasting_note.attachment_name(context_bottle: context_bottle) %></td>
               <td><%= tasting_note.overall %></td>
-              <td><%= tasting_note.score %></td>
+              <td><%= rating_circles(tasting_note.rating) %></td>
               <td><%= tasting_note.buy_label %></td>
               <td class="actions"><%= link_to "Show", tasting_note %></td>
             </tr>

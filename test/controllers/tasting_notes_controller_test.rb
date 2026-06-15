@@ -29,6 +29,8 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='tasting_note[buy]']", count: 0
     assert_select "input[name='tasting_note[buy_yes]'][type='checkbox']"
     assert_select "input[name='tasting_note[buy_no]'][type='checkbox']"
+    assert_select "input[name='tasting_note[rating]'][type='range'][min='0'][max='5'][step='0.25']"
+    assert_select "input[name='tasting_note[score]']", count: 0
     assert_select ".form-actions button", 1
     assert_select ".form-actions button", "Save"
     assert_select ".form-actions button", text: "Taste Another", count: 0
@@ -42,6 +44,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
             date: "2026-06-07",
             setting: "Home",
             overall: "Very nice.",
+            rating: "4.25",
             buy_yes: "1",
             buy_no: "0"
           },
@@ -53,6 +56,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_url
     assert_equal Date.new(2026, 6, 7), @bottle.reload.disposal_date
     assert_equal "Drink", @bottle.disposal_method
+    assert_equal BigDecimal("4.25"), TastingNote.last.rating
     assert_equal @vintage, WatchListEntry.last.watchable
   end
 
@@ -62,6 +66,8 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".error-messages", count: 0
     assert_select "input[name='tasting_note[vintage_lookup]']"
+    assert_select "input[name='tasting_note[rating]'][type='range']"
+    assert_select "output[data-tasting-note-target='ratingOutput']"
     assert_select "[data-tasting-note-target='newWineFields'][hidden]"
   end
 
@@ -75,6 +81,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
             date: "2026-06-07",
             setting: "Tasting room",
             overall: "Good.",
+            rating: "3.5",
             buy: "0"
           },
           finish_action: "taste_another"
@@ -93,6 +100,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
           tasteable_id: @vintage.id,
           date: "2026-06-07",
           overall: "Conflicted.",
+          rating: "3",
           buy_yes: "1",
           buy_no: "1"
         },
@@ -116,6 +124,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
                 date: "2026-06-07",
                 setting: "Retailer",
                 overall: "Buy again.",
+                rating: "4",
                 buy: "1"
               },
               new_wine: {
@@ -138,7 +147,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "updates and deletes tasting note" do
-    note = TastingNote.create!(date: Date.new(2026, 6, 7), tasteable: @vintage, overall: "Good.")
+    note = TastingNote.create!(date: Date.new(2026, 6, 7), tasteable: @vintage, overall: "Good.", rating: 2.5)
 
     patch tasting_note_url(note), params: {
       tasting_note: {
@@ -146,6 +155,7 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
         tasteable_id: @vintage.id,
         date: "2026-06-08",
         overall: "Excellent.",
+        rating: "4.75",
         buy: "1"
       }
     }
@@ -153,11 +163,23 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to tasting_note_url(note)
     assert_equal Date.new(2026, 6, 8), note.reload.date
     assert_equal "Excellent.", note.overall
+    assert_equal BigDecimal("4.75"), note.rating
     assert note.buy?
 
     assert_difference("TastingNote.count", -1) do
       delete tasting_note_url(note)
     end
     assert_redirected_to tasting_notes_url
+  end
+
+  test "show displays rating circles with numeric hover value" do
+    note = TastingNote.create!(date: Date.new(2026, 6, 7), tasteable: @vintage, overall: "Good.", rating: 2.5)
+
+    get tasting_note_url(note)
+
+    assert_response :success
+    assert_select "dt", "Rating"
+    assert_select ".rating-circles[title='2.5'][aria-label='Rating 2.5 out of 5']"
+    assert_select ".rating-circle", count: 5
   end
 end

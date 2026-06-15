@@ -20,6 +20,8 @@
     <dd><%= @wine.color %></dd>
     <dt>Appellation</dt>
     <dd><%= @wine.appellation %></dd>
+    <dt>Average rating</dt>
+    <dd><%= rating_circles(@average_rating, title: number_with_precision(@average_rating, precision: 2), label: "Average rating #{number_with_precision(@average_rating, precision: 2)} out of 5") if @average_rating.present? %></dd>
   </dl>
 
   <section class="related-section">

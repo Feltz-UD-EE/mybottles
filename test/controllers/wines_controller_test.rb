@@ -76,15 +76,18 @@ class WinesControllerTest < ActionDispatch::IntegrationTest
     bottle_2024 = Bottle.create!(personal_inventory: "A-024", vintage: vintage_2024)
     other_wine = Wine.create!(name: "Other Wine", producer: @producer)
     other_vintage = Vintage.create!(vintage: "2025", wine: other_wine)
-    TastingNote.create!(tasteable: bottle_2023, date: Date.new(2026, 6, 1), overall: "Older vintage bottle")
-    TastingNote.create!(tasteable: vintage_2024, date: Date.new(2026, 6, 2), overall: "Newer vintage note")
-    TastingNote.create!(tasteable: bottle_2024, date: Date.new(2026, 6, 3), overall: "Newer vintage bottle")
-    TastingNote.create!(tasteable: other_vintage, date: Date.new(2026, 6, 4), overall: "Other wine note")
+    TastingNote.create!(tasteable: bottle_2023, date: Date.new(2026, 6, 1), overall: "Older vintage bottle", rating: 2.5)
+    TastingNote.create!(tasteable: vintage_2024, date: Date.new(2026, 6, 2), overall: "Newer vintage note", rating: 4.0)
+    TastingNote.create!(tasteable: bottle_2024, date: Date.new(2026, 6, 3), overall: "Newer vintage bottle", rating: 4.75)
+    TastingNote.create!(tasteable: other_vintage, date: Date.new(2026, 6, 4), overall: "Other wine note", rating: 5.0)
 
     get wine_url(wine)
 
     assert_response :success
+    assert_select "dt", "Average rating"
+    assert_select ".rating-circles[title='3.75'][aria-label='Average rating 3.75 out of 5']"
     assert_select "h2", "Tasting Notes"
+    assert_select "th", "Rating"
     assert_select "td", "Older vintage bottle"
     assert_select "td", "Newer vintage note"
     assert_select "td", "Newer vintage bottle"

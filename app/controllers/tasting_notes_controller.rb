@@ -56,7 +56,7 @@ class TastingNotesController < ApplicationController
   end
 
   def tasting_note_params
-    params.expect(tasting_note: %i[ date setting temperature pairing color nose palate overall score buy buy_yes buy_no ])
+    params.expect(tasting_note: %i[ date setting temperature pairing color nose palate overall rating score buy buy_yes buy_no ])
   end
 
   def tasteable_params

@@ -31,6 +31,10 @@ class Wine < ApplicationRecord
     tasting_notes_for_wine(user).any?
   end
 
+  def average_rating(user)
+    TastingNote.average_rating_for_wine(self, user)
+  end
+
   private
 
   def producer_id_cannot_change

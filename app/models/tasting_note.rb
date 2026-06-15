@@ -11,7 +11,10 @@ class TastingNote < ApplicationRecord
 
   validates :date, presence: true
   validates :buy, inclusion: { in: [ true, false ] }, allow_nil: true
+  validates :rating, presence: true
+  validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }
   validates :score, numericality: true, allow_nil: true
+  validate :rating_must_be_quarter_increment
   validate :buy_choices_are_not_conflicting
 
   scope :for_bottles, ->(bottles) { where(tasteable_type: "Bottle", tasteable_id: bottles) }
@@ -92,6 +95,13 @@ class TastingNote < ApplicationRecord
     BOOLEAN.cast(buy_no)
   end
 
+  def self.average_rating_for_wine(wine, user)
+    notes = for_wine(wine, user)
+    return if notes.empty?
+
+    notes.sum(&:rating) / notes.size
+  end
+
   private
 
   def assign_buy_from_choices
@@ -110,5 +120,13 @@ class TastingNote < ApplicationRecord
     return unless buy_yes_selected? && buy_no_selected?
 
     errors.add(:buy, "cannot be both Yes and No")
+  end
+
+  def rating_must_be_quarter_increment
+    return if rating.blank?
+
+    unless (rating.to_d * 100 % 25).zero?
+      errors.add(:rating, "must be in 0.25 increments")
+    end
   end
 end

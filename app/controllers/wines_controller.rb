@@ -12,6 +12,7 @@ class WinesController < ApplicationController
     @pending_changes = ProposedChange.pending.for_target(@wine).where(proposed_by_user: current_user)
     @vintages = @wine.vintages.visible_to(current_user).includes(:bottles).order(:vintage)
     @tasting_notes = @wine.tasting_notes_for_wine(current_user)
+    @average_rating = @wine.average_rating(current_user)
   end
 
   def new

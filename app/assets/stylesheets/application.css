@@ -360,6 +360,38 @@ a {
   font-weight: 800;
 }
 
+.rating-slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-slider input[type="range"] {
+  max-width: 320px;
+}
+
+.rating-slider output {
+  min-width: 3ch;
+  font-weight: 700;
+}
+
+.rating-circles {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.rating-circle {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  border: 1px solid #000;
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, #16803a var(--rating-fill), #fff var(--rating-fill));
+}
+
 .splash {
   display: grid;
   gap: 12px;
