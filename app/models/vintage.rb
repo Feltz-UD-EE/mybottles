@@ -27,4 +27,8 @@ class Vintage < ApplicationRecord
   def tasted?(user)
     TastingNote.for_vintage(self, user).exists?
   end
+
+  def average_rating(user)
+    TastingNote.average_rating_for_wine(wine, user)
+  end
 end

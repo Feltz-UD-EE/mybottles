@@ -1,7 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["vintageInput", "tasteableId", "newWineFields"]
+  static targets = ["vintageInput", "tasteableId", "newWineFields", "ratingInput", "ratingOutput"]
+
+  connect() {
+    this.updateRating()
+  }
 
   selectVintage() {
     if (!this.hasVintageInputTarget || !this.hasTasteableIdTarget) return
@@ -21,5 +25,14 @@ export default class extends Controller {
     if (this.hasTasteableIdTarget) {
       this.tasteableIdTarget.value = ""
     }
+  }
+
+  updateRating() {
+    if (!this.hasRatingInputTarget || !this.hasRatingOutputTarget) return
+
+    this.ratingOutputTarget.value = Number(this.ratingInputTarget.value).toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    })
   }
 }

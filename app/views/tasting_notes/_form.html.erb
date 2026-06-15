@@ -103,8 +103,11 @@
   </div>
 
   <div class="field">
-    <%= form.label :score %>
-    <%= form.number_field :score, step: "0.1" %>
+    <%= form.label :rating %>
+    <div class="rating-slider">
+      <%= form.range_field :rating, min: 0, max: 5, step: 0.25, value: tasting_note.rating || 0, data: { tasting_note_target: "ratingInput", action: "input->tasting-note#updateRating" } %>
+      <output data-tasting-note-target="ratingOutput"><%= number_with_precision(tasting_note.rating || 0, precision: 2, strip_insignificant_zeros: true) %></output>
+    </div>
   </div>
 
   <div class="field">

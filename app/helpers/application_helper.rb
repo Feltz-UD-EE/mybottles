@@ -17,6 +17,22 @@ module ApplicationHelper
     content_tag(:span, "✓", class: "tasted-checkmark", role: "img", aria: { label: "Tasted" })
   end
 
+  def rating_circles(rating, title: nil, label: nil)
+    return if rating.blank?
+
+    value = BigDecimal(rating.to_s)
+    display_value = value.round(2)
+    title ||= display_value.to_s("F")
+    label ||= "Rating #{display_value.to_s("F")} out of 5"
+
+    content_tag(:span, class: "rating-circles", title: title, role: "img", aria: { label: label }) do
+      safe_join(5.times.map do |index|
+        fill = [[ (value - index) * 100, 0 ].max, 100 ].min
+        content_tag(:span, "", class: "rating-circle", style: "--rating-fill: #{fill.to_f}%;")
+      end)
+    end
+  end
+
   def review_record_path(record)
     case record
     when Producer then review_producer_path(record)

@@ -27,6 +27,8 @@
     <dd><%= simple_format(@tasting_note.palate) %></dd>
     <dt>Overall</dt>
     <dd><%= simple_format(@tasting_note.overall) %></dd>
+    <dt>Rating</dt>
+    <dd><%= rating_circles(@tasting_note.rating) %></dd>
     <dt>Score</dt>
     <dd><%= @tasting_note.score %></dd>
     <dt>Buy</dt>

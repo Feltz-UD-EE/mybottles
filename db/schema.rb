@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_14_170000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_15_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -403,8 +403,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_14_170000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false, comment: "The user who owns this record"
+    t.decimal "rating", precision: 3, scale: 2, default: "0.0", null: false, comment: "Structured personal rating from zero to five in quarter-point increments"
     t.index ["tasteable_type", "tasteable_id"], name: "index_tasting_notes_on_tasteable"
     t.index ["user_id"], name: "index_tasting_notes_on_user_id"
+    t.check_constraint "((rating * 100::numeric)::integer % 25) = 0", name: "chk_tasting_notes_rating_quarter_increment"
+    t.check_constraint "rating >= 0::numeric AND rating <= 5::numeric", name: "chk_tasting_notes_rating_range"
   end
 
   create_table "user_trust_events", id: :uuid, default: -> { "gen_random_uuid()" }, comment: "User trust events track promotions and demotions between trust levels.", force: :cascade do |t|
