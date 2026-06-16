@@ -82,6 +82,7 @@ Rails.application.routes.draw do
   resources :grape_synonyms, only: %i[ create edit update destroy ]
   resources :appellation_grapes, only: %i[ edit update destroy ]
   resources :bottles do
+    get :disposed, on: :collection
     get :label, on: :member
   end
   resources :cellars

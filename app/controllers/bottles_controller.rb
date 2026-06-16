@@ -3,7 +3,14 @@ class BottlesController < ApplicationController
   before_action :load_cellarable_options, only: %i[ new edit create update ]
 
   def index
-    @bottles = Bottle.visible_to(current_user).includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
+    @bottles = Bottle.visible_to(current_user).in_inventory.includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
+    @tasted_bottle_ids = tasted_bottle_ids(@bottles)
+  end
+
+  def disposed
+    @disposal_method = params[:disposal_method].presence
+    @bottles = Bottle.visible_to(current_user).disposed.includes(vintage: { wine: :producer }).order(disposal_date: :desc, created_at: :desc)
+    @bottles = @bottles.where(disposal_method: @disposal_method) if Bottle::DISPOSAL_METHODS.include?(@disposal_method)
     @tasted_bottle_ids = tasted_bottle_ids(@bottles)
   end
 
