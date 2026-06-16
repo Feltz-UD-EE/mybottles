@@ -12,6 +12,7 @@ class Bottle < ApplicationRecord
   before_validation :assign_auto_inventory
 
   scope :in_inventory, -> { where(disposal_date: nil) }
+  scope :disposed, -> { where.not(disposal_date: nil) }
 
   validates :list_price, :discount_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :disposal_method, inclusion: { in: DISPOSAL_METHODS }, allow_blank: true

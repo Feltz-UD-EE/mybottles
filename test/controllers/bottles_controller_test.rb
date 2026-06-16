@@ -25,10 +25,72 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "td", "Not Cellared"
     assert_select "tbody tr:first-child td:first-child", "A-002"
     assert_select "th", "Tasted"
+    assert_select "th", { text: "In Inventory", count: 0 }
+    assert_select "a[href=?]", disposed_bottles_path, text: "Disposed Bottles"
     assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: newer_bottle.id }), text: "Tasted This"
+  end
+
+  test "index includes only bottles in inventory" do
+    Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6))
+    Bottle.create!(personal_inventory: "A-002", vintage: @vintage, purchase_date: Date.new(2026, 6, 7), disposal_date: Date.new(2026, 6, 8), disposal_method: "Drink")
+
+    get bottles_url
+
+    assert_response :success
+    assert_select "td", "A-001"
+    assert_select "td", { text: "A-002", count: 0 }
+  end
+
+  test "disposed lists disposed bottles by disposal date descending" do
+    Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6))
+    older_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage, purchase_date: Date.new(2026, 6, 7), disposal_date: Date.new(2026, 6, 8), disposal_method: "Drink")
+    newer_bottle = Bottle.create!(personal_inventory: "A-003", vintage: @vintage, purchase_date: Date.new(2026, 6, 7), disposal_date: Date.new(2026, 6, 9), disposal_method: "Gift")
+    TastingNote.create!(tasteable: newer_bottle, date: Date.new(2026, 6, 9), overall: "Shared")
+
+    get disposed_bottles_url
+
+    assert_response :success
+    assert_select "h1", "Disposed Bottles"
+    assert_select "a[href=?]", bottles_path, text: "Back to bottles"
+    assert_select "select[name='disposal_method'] option", "All"
+    Bottle::DISPOSAL_METHODS.each do |method|
+      assert_select "select[name='disposal_method'] option[value=?]", method, text: method
+    end
+    assert_select "td", { text: "A-001", count: 0 }
+    assert_select "td", "A-002"
+    assert_select "td", "A-003"
+    assert_select "td", "2026-06-08"
+    assert_select "td", "2026-06-09"
+    assert_select "td", "Drink"
+    assert_select "td", "Gift"
+    assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1
+    assert_operator response.body.index(newer_bottle.personal_inventory), :<, response.body.index(older_bottle.personal_inventory)
+  end
+
+  test "disposed filters bottles by disposal method" do
+    Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_date: Date.new(2026, 6, 8), disposal_method: "Drink")
+    Bottle.create!(personal_inventory: "A-002", vintage: @vintage, disposal_date: Date.new(2026, 6, 9), disposal_method: "Gift")
+
+    get disposed_bottles_url(disposal_method: "Gift")
+
+    assert_response :success
+    assert_select "select[name='disposal_method'] option[selected][value='Gift']", "Gift"
+    assert_select "td", { text: "A-001", count: 0 }
+    assert_select "td", "A-002"
+  end
+
+  test "disposed all option does not filter by disposal method" do
+    Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_date: Date.new(2026, 6, 8), disposal_method: "Drink")
+    Bottle.create!(personal_inventory: "A-002", vintage: @vintage, disposal_date: Date.new(2026, 6, 9), disposal_method: "Gift")
+
+    get disposed_bottles_url(disposal_method: "")
+
+    assert_response :success
+    assert_select "td", "A-001"
+    assert_select "td", "A-002"
   end
 
   test "show title includes producer wine and vintage and tasting note launch" do
