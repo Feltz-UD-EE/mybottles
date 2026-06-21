@@ -14,7 +14,7 @@ class WineClubsController < ApplicationController
   end
 
   def new
-    @wine_club = WineClub.new
+    @wine_club = WineClub.new(params[:wine_club]&.permit(:producer_id) || {})
   end
 
   def edit

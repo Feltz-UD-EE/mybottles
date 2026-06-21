@@ -42,6 +42,13 @@ class WineClubsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-wine-club-target='newProducerFields'][hidden]"
   end
 
+  test "new preloads producer from params" do
+    get new_wine_club_url(wine_club: { producer_id: @producer.id })
+
+    assert_response :success
+    assert_select "select[name='wine_club[producer_id]'] option[selected][value=?]", @producer.id
+  end
+
   test "creates updates and deletes wine club" do
     assert_difference("WineClub.count", 1) do
       post wine_clubs_url, params: {

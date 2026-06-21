@@ -3,6 +3,7 @@
     <h1><%= @producer.name %> <%= community_status_tag(@producer) %> <%= pending_edit_tag(@producer) %></h1>
     <div class="actions">
       <%= link_to "Edit", edit_producer_path(@producer) %>
+      <%= link_to "Joined Club", new_wine_club_path(wine_club: { producer_id: @producer.id }), class: "button button--primary" %>
       <%= link_to "Back to producers", producers_path %>
       <%= button_to "Delete", @producer, method: :delete, class: "button button--danger", form: { data: { turbo_confirm: "Delete this producer?" } } %>
     </div>
@@ -17,7 +18,15 @@
     <dd><%= link_to @producer.website, @producer.website if @producer.website.present? %></dd>
     <dt>Phone</dt>
     <dd><%= @producer.phone %></dd>
+    <dt>Notes</dt>
+    <dd><%= simple_format(@producer.notes) %></dd>
+    <dt>Tasting room</dt>
+    <dd><%= simple_format(@producer.tasting_room) %></dd>
+    <dt>Club options</dt>
+    <dd><%= simple_format(@producer.club_options) %></dd>
   </dl>
+
+  <%= render "producers/wine_clubs", wine_clubs: @wine_clubs if @wine_clubs.any? %>
 
   <section class="related-section">
     <h2>Wines</h2>

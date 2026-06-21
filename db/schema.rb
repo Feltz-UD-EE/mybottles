@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_15_100000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -195,6 +195,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_15_100000) do
     t.uuid "rejected_by_user_id", comment: "User who rejected this record"
     t.datetime "rejected_at", comment: "When this record was rejected"
     t.uuid "merged_into_id", comment: "Canonical record this duplicate was merged into"
+    t.text "notes", comment: "General free-form notes about the producer"
+    t.text "tasting_room", comment: "Free-form notes about the producer tasting room"
+    t.text "club_options", comment: "Free-form notes about producer wine club options"
     t.index ["approved_by_user_id"], name: "index_producers_on_approved_by_user_id"
     t.index ["created_by_user_id"], name: "index_producers_on_created_by_user_id"
     t.index ["merged_into_id"], name: "index_producers_on_merged_into_id"
