@@ -103,7 +103,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Producer - Estate Red - 2024"
     assert_select "dt", "Location"
     assert_select "dd", "Main"
-    assert_select "a[href=?]", label_bottle_path(bottle), text: "Print labels"
+    assert_select "a[href=?]", label_bottle_path(bottle), text: "Print label"
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
   end
@@ -140,6 +140,15 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-controller='print-label'][data-print-label-enabled-value='true'][data-print-label-url-value=?]", label_bottle_path(bottle)
+  end
+
+  test "show auto print hook is disabled when print label param is false" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+
+    get bottle_url(bottle, print_label: false)
+
+    assert_response :success
+    assert_select "[data-controller='print-label'][data-print-label-enabled-value='false'][data-print-label-url-value=?]", label_bottle_path(bottle)
   end
 
   test "show auto print hook can target batch labels" do
