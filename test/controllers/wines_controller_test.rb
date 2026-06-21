@@ -15,7 +15,7 @@ class WinesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Wines"
     assert_select "[data-controller='table']"
-    assert_select "tbody tr:first-child td:first-child", "Producer"
+    assert_select "tbody tr", text: /Producer\s+Estate Rosé/
     assert_select "a[href=?]", wine_path(wine), "Estate Rosé"
     assert_select "th", "Tasted"
     assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1

@@ -19,25 +19,34 @@ class ProducersController < ApplicationController
 
   def new
     @producer = Producer.new
+    load_producer_form_wines
   end
 
   def edit
+    load_producer_form_wines
   end
 
   def create
     @producer = Producer.new(producer_params)
+    wine_attributes = producer_wine_params
 
-    if @producer.save
-      redirect_to @producer, notice: "Producer was successfully created."
+    created_wines = save_producer_with_wines(@producer, wine_attributes)
+    if created_wines
+      redirect_to @producer, notice: producer_save_notice("created", created_wines.count)
     else
+      load_producer_form_wines(wine_attributes)
       render :new, status: :unprocessable_entity
     end
   end
 
   def update
-    if handle_community_update(@producer, producer_params)
-      redirect_to @producer, notice: community_update_notice(@producer)
+    wine_attributes = producer_wine_params
+    created_wines = update_producer_with_wines(@producer, producer_params, wine_attributes)
+
+    if created_wines
+      redirect_to @producer, notice: producer_save_notice("updated", created_wines.count)
     else
+      load_producer_form_wines(wine_attributes)
       render :edit, status: :unprocessable_entity
     end
   end
@@ -58,5 +67,70 @@ class ProducersController < ApplicationController
 
   def producer_params
     params.expect(producer: %i[ name address email website phone ])
+  end
+
+  def producer_wine_params
+    params.fetch(:producer, {})
+      .fetch(:wines_attributes, {})
+      .permit!
+      .to_h
+      .values
+      .map { |attributes| attributes.stringify_keys.slice("name", "description", "style", "color", "appellation", "vintage") }
+      .reject { |attributes| attributes.values.all?(&:blank?) }
+  end
+
+  def load_producer_form_wines(submitted_wines = nil)
+    @existing_wines = @producer.persisted? ? @producer.wines.visible_to(current_user).order(:name) : Wine.none
+    @producer_wines = submitted_wines.presence || [ {} ]
+  end
+
+  def save_producer_with_wines(producer, wine_attributes)
+    created_wines = []
+
+    ActiveRecord::Base.transaction do
+      producer.save!
+      created_wines = create_wines_for_producer!(producer, wine_attributes)
+    end
+
+    created_wines
+  rescue ActiveRecord::RecordInvalid => error
+    merge_nested_errors(@producer, error.record)
+    false
+  end
+
+  def update_producer_with_wines(producer, producer_attributes, wine_attributes)
+    created_wines = []
+
+    ActiveRecord::Base.transaction do
+      unless handle_community_update(producer, producer_attributes)
+        raise ActiveRecord::Rollback
+      end
+
+      created_wines = create_wines_for_producer!(producer, wine_attributes)
+    end
+
+    created_wines
+  rescue ActiveRecord::RecordInvalid => error
+    merge_nested_errors(@producer, error.record)
+    false
+  end
+
+  def create_wines_for_producer!(producer, wine_attributes)
+    wine_attributes.map do |attributes|
+      vintage_value = attributes["vintage"]
+      wine = producer.wines.create!(attributes.except("vintage").merge(created_by_user: current_user))
+      wine.vintages.create!(vintage: vintage_value, created_by_user: current_user) if vintage_value.present?
+      wine
+    end
+  end
+
+  def merge_nested_errors(producer, record)
+    return if record == producer
+
+    record.errors.full_messages.each { |message| producer.errors.add(:base, message) }
+  end
+
+  def producer_save_notice(action, wine_count)
+    "Producer was successfully #{action}. #{wine_count} #{'wine'.pluralize(wine_count)} #{wine_count == 1 ? 'was' : 'were'} created."
   end
 end

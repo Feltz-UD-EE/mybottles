@@ -1,0 +1,39 @@
+<fieldset class="inline-fields nested-fields-row producer-wine-fields">
+  <legend>New Wine</legend>
+
+  <div class="field">
+    <label for="producer_wines_attributes_<%= index %>_name">Name</label>
+    <input id="producer_wines_attributes_<%= index %>_name" type="text" name="producer[wines_attributes][<%= index %>][name]" value="<%= wine_attributes['name'] %>">
+  </div>
+
+  <div class="field">
+    <label for="producer_wines_attributes_<%= index %>_description">Description</label>
+    <textarea id="producer_wines_attributes_<%= index %>_description" name="producer[wines_attributes][<%= index %>][description]"><%= wine_attributes['description'] %></textarea>
+  </div>
+
+  <div class="field">
+    <label for="producer_wines_attributes_<%= index %>_style">Style</label>
+    <select id="producer_wines_attributes_<%= index %>_style" name="producer[wines_attributes][<%= index %>][style]">
+      <option value=""></option>
+      <%= options_for_select(Wine::STYLES, wine_attributes["style"]) %>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="producer_wines_attributes_<%= index %>_color">Color</label>
+    <select id="producer_wines_attributes_<%= index %>_color" name="producer[wines_attributes][<%= index %>][color]">
+      <option value=""></option>
+      <%= options_for_select(Wine::COLORS, wine_attributes["color"]) %>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="producer_wines_attributes_<%= index %>_appellation">Appellation</label>
+    <input id="producer_wines_attributes_<%= index %>_appellation" type="text" name="producer[wines_attributes][<%= index %>][appellation]" value="<%= wine_attributes['appellation'] %>">
+  </div>
+
+  <div class="field">
+    <label for="producer_wines_attributes_<%= index %>_vintage">Vintage</label>
+    <input id="producer_wines_attributes_<%= index %>_vintage" type="text" name="producer[wines_attributes][<%= index %>][vintage]" value="<%= wine_attributes['vintage'] %>">
+  </div>
+</fieldset>
