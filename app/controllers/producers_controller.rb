@@ -15,6 +15,7 @@ class ProducersController < ApplicationController
   def show
     @pending_changes = ProposedChange.pending.for_target(@producer).where(proposed_by_user: current_user)
     @wines = @producer.wines.visible_to(current_user).order(:name)
+    load_visible_wine_clubs
   end
 
   def new
@@ -24,6 +25,7 @@ class ProducersController < ApplicationController
 
   def edit
     load_producer_form_wines
+    load_visible_wine_clubs
   end
 
   def create
@@ -66,7 +68,7 @@ class ProducersController < ApplicationController
   end
 
   def producer_params
-    params.expect(producer: %i[ name address email website phone ])
+    params.expect(producer: %i[ name address email website phone notes tasting_room club_options ])
   end
 
   def producer_wine_params
@@ -82,6 +84,10 @@ class ProducersController < ApplicationController
   def load_producer_form_wines(submitted_wines = nil)
     @existing_wines = @producer.persisted? ? @producer.wines.visible_to(current_user).order(:name) : Wine.none
     @producer_wines = submitted_wines.presence || [ {} ]
+  end
+
+  def load_visible_wine_clubs
+    @wine_clubs = @producer.wine_clubs.visible_to(current_user).order(:date_left, :tier, :created_at)
   end
 
   def save_producer_with_wines(producer, wine_attributes)

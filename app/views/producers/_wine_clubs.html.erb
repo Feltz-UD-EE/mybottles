@@ -1,0 +1,34 @@
+<section class="related-section producer-wine-clubs">
+  <h2>Wine Clubs</h2>
+
+  <% if wine_clubs.any? %>
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Size</th>
+            <th>Schedule</th>
+            <th>Delivery Method</th>
+            <th>Date Joined</th>
+            <th>Date Left</th>
+            <th>Member ID</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% wine_clubs.each do |wine_club| %>
+            <tr>
+              <td><%= link_to wine_club.tier, wine_club %></td>
+              <td><%= wine_club.size %></td>
+              <td><%= wine_club.schedule %></td>
+              <td><%= wine_club.delivery_method %></td>
+              <td><%= wine_club.date_joined&.iso8601 %></td>
+              <td><%= wine_club.date_left&.iso8601 %></td>
+              <td><%= wine_club.member_id %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</section>

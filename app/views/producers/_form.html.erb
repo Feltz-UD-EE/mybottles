@@ -26,6 +26,23 @@
     <%= form.telephone_field :phone %>
   </div>
 
+  <div class="field">
+    <%= form.label :notes %>
+    <%= form.text_area :notes %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tasting_room, "Tasting room" %>
+    <%= form.text_area :tasting_room %>
+  </div>
+
+  <div class="field">
+    <%= form.label :club_options, "Club options" %>
+    <%= form.text_area :club_options %>
+  </div>
+
+  <%= render "producers/wine_clubs", wine_clubs: @wine_clubs if @wine_clubs.present? %>
+
   <section class="form-panel producer-wines-form" data-controller="nested-fields">
     <h2>Wines</h2>
 
