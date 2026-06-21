@@ -752,6 +752,12 @@ a {
   place-items: center;
 }
 
+.print-label-page--batch {
+  align-content: start;
+  gap: 8mm;
+  padding: 8mm;
+}
+
 .bottle-label {
   width: 90mm;
   height: 29mm;
@@ -825,5 +831,12 @@ a {
 
   .bottle-label {
     border: 0;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .bottle-label:last-child {
+    break-after: auto;
+    page-break-after: auto;
   }
 }

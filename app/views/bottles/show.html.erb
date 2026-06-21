@@ -1,4 +1,4 @@
-<main class="page-section" data-controller="print-label" data-print-label-enabled-value="<%= params[:print_label].present? %>" data-print-label-url-value="<%= label_bottle_path(@bottle) %>">
+<main class="page-section" data-controller="print-label" data-print-label-enabled-value="<%= params[:print_label].present? %>" data-print-label-url-value="<%= @print_label_url %>">
   <div class="page-header">
     <h1><%= @producer.name %> - <%= @wine.name %> - <%= @vintage.vintage %></h1>
     <div class="actions">

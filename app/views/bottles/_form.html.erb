@@ -1,6 +1,13 @@
 <%= form_with(model: bottle, class: "resource-form") do |form| %>
   <%= render "shared/errors", resource: bottle %>
 
+  <% if bottle.new_record? %>
+    <div class="field">
+      <%= form.label :quantity %>
+      <%= form.number_field :quantity, min: 1, step: 1, value: bottle.quantity.presence || 1 %>
+    </div>
+  <% end %>
+
   <div class="field">
     <%= form.label :vintage_id, "Vintage" %>
     <%= form.collection_select :vintage_id, Vintage.visible_to(current_user).includes(wine: :producer).sort_by(&:selection_name), :id, :selection_name, { prompt: "Select a vintage" }, required: true %>
