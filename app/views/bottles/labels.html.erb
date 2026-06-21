@@ -1,0 +1,31 @@
+<% content_for :title, "#{@label_app_name} Labels" %>
+
+<main class="print-label-page print-label-page--batch" data-controller="print-page">
+  <% @bottles.each do |bottle| %>
+    <% label_url = URI.join(Rails.configuration.x.label_printing.base_url, bottle_path(bottle)).to_s %>
+    <% qr_svg = RQRCode::QRCode.new(label_url, size: 4, level: :l).as_svg(
+      color: "000",
+      fill: "fff",
+      module_size: 4,
+      shape_rendering: "crispEdges",
+      standalone: true,
+      viewbox: true,
+      use_path: true
+    ) %>
+
+    <section class="bottle-label" aria-label="Bottle label">
+      <div class="bottle-label__brand">
+        <%= image_tag "my_bottles_mark.svg", class: "bottle-label__mark", alt: "" %>
+        <span><%= @label_app_name %></span>
+      </div>
+
+      <div class="bottle-label__qr" aria-label="QR code for <%= label_url %>"><%= raw qr_svg %></div>
+
+      <% if bottle.personal_inventory.present? %>
+        <div class="bottle-label__inventory"><%= bottle.personal_inventory %></div>
+      <% elsif bottle.auto_inventory.present? %>
+        <div class="bottle-label__inventory"><%= bottle.auto_inventory_display %></div>
+      <% end %>
+    </section>
+  <% end %>
+</main>

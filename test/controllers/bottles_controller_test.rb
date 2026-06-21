@@ -142,6 +142,25 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-controller='print-label'][data-print-label-enabled-value='true'][data-print-label-url-value=?]", label_bottle_path(bottle)
   end
 
+  test "show auto print hook can target batch labels" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+    batch_path = labels_bottles_path(ids: bottle.id)
+
+    get bottle_url(bottle, print_label: true, print_label_url: batch_path)
+
+    assert_response :success
+    assert_select "[data-controller='print-label'][data-print-label-enabled-value='true'][data-print-label-url-value=?]", batch_path
+  end
+
+  test "show auto print hook ignores external print label urls" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+
+    get bottle_url(bottle, print_label: true, print_label_url: "https://example.com/labels")
+
+    assert_response :success
+    assert_select "[data-controller='print-label'][data-print-label-enabled-value='true'][data-print-label-url-value=?]", label_bottle_path(bottle)
+  end
+
   test "label renders qr code and label content" do
     bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
 
@@ -179,6 +198,18 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".bottle-label__inventory", { text: "000-001", count: 0 }
   end
 
+  test "labels renders multiple labels in submitted order" do
+    first_bottle = Bottle.create!(vintage: @vintage, disposal_method: "Drink")
+    second_bottle = Bottle.create!(vintage: @vintage, disposal_method: "Drink")
+
+    get labels_bottles_url(ids: [ second_bottle.id, first_bottle.id ].join(","))
+
+    assert_response :success
+    assert_select "[data-controller='print-page']"
+    assert_select ".bottle-label", count: 2
+    assert_operator response.body.index(second_bottle.auto_inventory_display), :<, response.body.index(first_bottle.auto_inventory_display)
+  end
+
   test "new preloads vintage from params" do
     alpha_producer = Producer.create!(name: "Alpha Producer")
     alpha_wine = Wine.create!(name: "Alpha Wine", producer: alpha_producer)
@@ -188,12 +219,22 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "select[name='bottle[vintage_id]'] option[selected][value=?]", @vintage.id
+    assert_select "input[name='bottle[quantity]'][value='1']"
     assert_select "select[name='bottle[vintage_id]'] option", "Producer - Estate Red (2024)"
     assert_select "select[name='bottle[cellarable_selection]'] option", "Not Cellared"
 
     option_texts = css_select("select[name='bottle[vintage_id]'] option").map(&:text)
     assert_operator option_texts.index("Alpha Producer - Alpha Wine (2023)"), :<,
       option_texts.index("Producer - Estate Red (2024)")
+  end
+
+  test "edit does not show quantity field" do
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
+
+    get edit_bottle_url(bottle)
+
+    assert_response :success
+    assert_select "input[name='bottle[quantity]']", count: 0
   end
 
   test "creates updates and deletes bottle" do
@@ -230,5 +271,85 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to bottle_url(bottle, print_label: false)
     assert_equal "000001", bottle.auto_inventory
     assert_equal "000-001", bottle.inventory_code
+  end
+
+  test "rejects invalid quantity" do
+    assert_no_difference("Bottle.count") do
+      post bottles_url, params: { bottle: { quantity: "0", vintage_id: @vintage.id } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-messages li", "Quantity must be an integer greater than or equal to 1"
+  end
+
+  test "creates multiple bottles with blank personal inventory" do
+    cellar = Cellar.create!(name: "Main")
+
+    assert_difference("Bottle.count", 3) do
+      post bottles_url, params: { bottle: { quantity: "3", personal_inventory: "", vintage_id: @vintage.id, purchase_date: "2026-06-06", purchase_source: "Shop", list_price: "25.00", disposal_method: "Drink", cellarable_selection: "Cellar:#{cellar.id}" } }
+    end
+
+    created_bottles = Bottle.order(:created_at).last(3)
+    assert_redirected_to bottle_url(created_bottles.first, print_label: false)
+    assert_equal "3 bottles were successfully created.", flash[:notice]
+    assert_equal [ "" ], created_bottles.map(&:personal_inventory).uniq
+    assert_equal 3, created_bottles.map(&:auto_inventory).uniq.size
+    created_bottles.each do |bottle|
+      assert_equal @vintage, bottle.vintage
+      assert_equal Date.new(2026, 6, 6), bottle.purchase_date
+      assert_equal "Shop", bottle.purchase_source
+      assert_equal BigDecimal("25.00"), bottle.list_price
+      assert_equal "Drink", bottle.disposal_method
+      assert_equal cellar, bottle.cellarable
+    end
+  end
+
+  test "creates multiple bottles with personal inventory only on first bottle" do
+    assert_difference("Bottle.count", 3) do
+      post bottles_url, params: { bottle: { quantity: "3", personal_inventory: "A-001", vintage_id: @vintage.id, purchase_date: "2026-06-06" } }
+    end
+
+    created_bottles = Bottle.order(:created_at).last(3)
+    assert_redirected_to bottle_url(created_bottles.first, print_label: false)
+    assert_equal "A-001", created_bottles.first.personal_inventory
+    assert_nil created_bottles.second.personal_inventory
+    assert_nil created_bottles.third.personal_inventory
+    assert_equal 2, created_bottles.drop(1).map(&:auto_inventory).uniq.size
+    assert_includes flash[:notice], "3 bottles were successfully created."
+    assert_includes flash[:notice], "Only the first bottle has the personal inventory code."
+    assert_includes flash[:notice], "The remaining 2 bottles do not have their personal inventory code completed"
+    assert_includes flash[:notice], "do not print labels for those bottles until after updating their personal inventory code"
+  end
+
+  test "failed multi bottle creation does not persist partial bottles" do
+    assert_no_difference("Bottle.count") do
+      post bottles_url, params: { bottle: { quantity: "3", vintage_id: @vintage.id, cellarable_selection: "Cellar:missing" } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".error-messages li", "Cellarable is invalid"
+  end
+
+  test "automatic label printing opens batch labels when personal inventory is blank" do
+    admin_user.update!(print_labels_by_default: true)
+
+    assert_difference("Bottle.count", 2) do
+      post bottles_url, params: { bottle: { quantity: "2", personal_inventory: "", vintage_id: @vintage.id } }
+    end
+
+    created_bottles = Bottle.order(:created_at).last(2)
+    batch_path = labels_bottles_path(ids: created_bottles.map(&:id).join(","))
+    assert_redirected_to bottle_url(created_bottles.first, print_label: true, print_label_url: batch_path)
+  end
+
+  test "automatic label printing opens only first label when personal inventory is present" do
+    admin_user.update!(print_labels_by_default: true)
+
+    assert_difference("Bottle.count", 2) do
+      post bottles_url, params: { bottle: { quantity: "2", personal_inventory: "A-001", vintage_id: @vintage.id } }
+    end
+
+    created_bottles = Bottle.order(:created_at).last(2)
+    assert_redirected_to bottle_url(created_bottles.first, print_label: true)
   end
 end

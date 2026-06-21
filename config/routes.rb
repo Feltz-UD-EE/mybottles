@@ -83,6 +83,7 @@ Rails.application.routes.draw do
   resources :appellation_grapes, only: %i[ edit update destroy ]
   resources :bottles do
     get :disposed, on: :collection
+    get :labels, on: :collection
     get :label, on: :member
   end
   resources :cellars

@@ -1,6 +1,8 @@
 class Bottle < ApplicationRecord
   include OwnedByUser
 
+  attr_accessor :quantity
+
   DISPOSAL_METHODS = %w[Drink Gift Sale Spoiled].freeze
   AUTO_INVENTORY_FORMAT = /\A[A-Z0-9]+\z/
 
