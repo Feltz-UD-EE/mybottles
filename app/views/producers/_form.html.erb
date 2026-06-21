@@ -26,6 +26,33 @@
     <%= form.telephone_field :phone %>
   </div>
 
+  <section class="form-panel producer-wines-form" data-controller="nested-fields">
+    <h2>Wines</h2>
+
+    <% if @existing_wines.any? %>
+      <div class="existing-wines">
+        <h3>Existing Wines</h3>
+        <ul>
+          <% @existing_wines.each do |wine| %>
+            <li><%= wine.name %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div data-nested-fields-target="container">
+      <% @producer_wines.each_with_index do |wine_attributes, index| %>
+        <%= render "producers/wine_fields", index: index, wine_attributes: wine_attributes %>
+      <% end %>
+    </div>
+
+    <template data-nested-fields-target="template">
+      <%= render "producers/wine_fields", index: "NEW_RECORD", wine_attributes: {} %>
+    </template>
+
+    <button class="button" type="button" data-action="nested-fields#add">Add another wine</button>
+  </section>
+
   <div class="form-actions">
     <%= form.submit %>
   </div>

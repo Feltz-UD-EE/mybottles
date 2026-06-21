@@ -15,8 +15,7 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Vintages"
     assert_select "[data-controller='table']"
-    assert_select "tbody tr:first-child td:first-child", "Producer"
-    assert_select "tbody tr:first-child td:nth-child(2)", "Estate Red"
+    assert_select "tbody tr", text: /Producer\s+Estate Red\s+2024/
     assert_select "a[href=?]", vintage_path(Vintage.last), "2024"
     assert_select "th", "Tasted"
     assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1

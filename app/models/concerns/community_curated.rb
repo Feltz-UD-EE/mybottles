@@ -78,7 +78,6 @@ module CommunityCurated
 
   def assign_approval_defaults
     self.created_by_user ||= Current.user || User.system_administrator
-    return if approval_status.present?
 
     if created_by_user&.reviewer?
       self.approval_status = "Approved"
