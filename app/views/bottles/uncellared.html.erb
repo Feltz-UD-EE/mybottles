@@ -1,0 +1,41 @@
+<main class="page-section">
+  <div class="page-header">
+    <h1>Uncellared Bottles</h1>
+    <div class="page-actions">
+      <%= link_to "Back to bottles", bottles_path, class: "button" %>
+    </div>
+  </div>
+
+  <%= form_with url: adjust_uncellared_inventory_bottles_path, method: :patch do %>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Inventory</th>
+            <th>Wine</th>
+            <th>Purchase date</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @bottles.each do |bottle| %>
+            <tr>
+              <td><%= check_box_tag "bottle_ids[]", bottle.id, false, id: "bottle_ids_#{bottle.id}" %></td>
+              <td><%= link_to bottle.inventory_code, bottle %></td>
+              <td><%= link_to bottle.display_name, bottle.vintage %></td>
+              <td><%= bottle.purchase_date&.iso8601 %></td>
+              <td><%= bottle.purchase_source %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="empty-state"><%= "No uncellared bottles." if @bottles.empty? %></p>
+
+    <div class="form-actions">
+      <%= submit_tag "Adjust inventory", class: "button button--primary" %>
+    </div>
+  <% end %>
+</main>

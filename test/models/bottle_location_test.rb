@@ -17,9 +17,9 @@ class BottleLocationTest < ActiveSupport::TestCase
     cellar_shelf = Shelf.create!(shelveable: fridge, number: "2", label: "Whites")
     bar_fridge = Cellar.create!(name: "Bar Fridge")
 
-    assert_equal "Beach House - North 5", Bottle.create!(vintage: @vintage, cellarable: bay_shelf).location_name
+    assert_equal "Beach House Bay North Shelf 5", Bottle.create!(vintage: @vintage, cellarable: bay_shelf).location_name
     assert_equal "Main - Everyday Spanish", Bottle.create!(vintage: @vintage, cellarable: bin).location_name
-    assert_equal "Fridge 1 - Shelf 2", Bottle.create!(vintage: @vintage, cellarable: cellar_shelf).location_name
+    assert_equal "Fridge 1 Shelf 2", Bottle.create!(vintage: @vintage, cellarable: cellar_shelf).location_name
     assert_equal "Bar Fridge", Bottle.create!(vintage: @vintage, cellarable: bar_fridge).location_name
     assert_equal "Not Cellared", Bottle.create!(vintage: @vintage).location_name
   end
@@ -32,7 +32,7 @@ class BottleLocationTest < ActiveSupport::TestCase
     cellar_shelf = Shelf.create!(shelveable: cellar, number: "2", label: "Whites")
 
     assert_equal "Bin 3 - Everyday Spanish", bin.cellarable_selection_name
-    assert_equal "Bay North Shelf 5 - Aging Reds", bay_shelf.cellarable_selection_name
-    assert_equal "Shelf 2 - Whites", cellar_shelf.cellarable_selection_name
+    assert_equal "Main Bay North Shelf 5 - Aging Reds", bay_shelf.cellarable_selection_name
+    assert_equal "Main Shelf 2 - Whites", cellar_shelf.cellarable_selection_name
   end
 end

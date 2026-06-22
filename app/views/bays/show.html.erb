@@ -47,4 +47,9 @@
       </table>
     </div>
   </section>
+
+  <section class="related-section">
+    <h2>Bottles Stored</h2>
+    <%= render "bottles/compact_table", bottles: @bottles, empty_message: "No bottles stored here." %>
+  </section>
 </main>

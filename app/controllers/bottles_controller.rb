@@ -7,6 +7,22 @@ class BottlesController < ApplicationController
     @tasted_bottle_ids = tasted_bottle_ids(@bottles)
   end
 
+  def uncellared
+    @bottles = Bottle.visible_to(current_user).in_inventory.uncellared.includes(vintage: { wine: :producer }).order(purchase_date: :desc, created_at: :desc)
+  end
+
+  def adjust_uncellared_inventory
+    bottle_ids = params.fetch(:bottle_ids, []).compact_blank
+    adjusted_count = Bottle
+      .visible_to(current_user)
+      .in_inventory
+      .uncellared
+      .where(id: bottle_ids)
+      .update_all(disposal_method: "Inventory Adjustment", disposal_date: Date.current, updated_at: Time.current)
+
+    redirect_to uncellared_bottles_url, notice: "#{adjusted_count} #{'bottle'.pluralize(adjusted_count)} adjusted."
+  end
+
   def disposed
     @disposal_method = params[:disposal_method].presence
     @bottles = Bottle.visible_to(current_user).disposed.includes(vintage: { wine: :producer }).order(disposal_date: :desc, created_at: :desc)

@@ -19,4 +19,8 @@ class Bay < ApplicationRecord
   def current_bottle_count
     Bottle.in_inventory.where(cellarable: shelves).count
   end
+
+  def current_bottles
+    Bottle.in_inventory.where(cellarable: shelves)
+  end
 end

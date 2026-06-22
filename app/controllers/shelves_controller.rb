@@ -7,6 +7,7 @@ class ShelvesController < ApplicationController
   end
 
   def show
+    @bottles = @shelf.current_bottles.includes(vintage: { wine: :producer }).order(:personal_inventory, :auto_inventory)
   end
 
   def new

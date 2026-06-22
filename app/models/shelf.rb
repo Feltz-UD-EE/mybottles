@@ -19,14 +19,18 @@ class Shelf < ApplicationRecord
 
   def location_name
     if shelveable.is_a?(Bay)
-      [ shelveable.cellar.name, [ shelveable.label, number ].compact_blank.join(" ") ].compact_blank.join(" - ")
+      [ shelveable.cellar.name, "Bay #{shelveable.label}".strip, "Shelf #{number}".strip ].compact_blank.join(" ")
     else
-      [ shelveable.name, "Shelf #{number}".strip ].compact_blank.join(" - ")
+      [ shelveable.name, "Shelf #{number}".strip ].compact_blank.join(" ")
     end
   end
 
   def cellarable_selection_name
-    shelf_name = [ bay_selection_name, "Shelf #{number}".strip ].compact_blank.join(" ")
+    shelf_name = if bay
+      [ cellar.name, bay_selection_name, "Shelf #{number}".strip ].compact_blank.join(" ")
+    else
+      [ cellar.name, "Shelf #{number}".strip ].compact_blank.join(" ")
+    end
 
     [ shelf_name, label ].compact_blank.join(" - ")
   end
@@ -41,6 +45,10 @@ class Shelf < ApplicationRecord
 
   def current_bottle_count
     bottles.in_inventory.count
+  end
+
+  def current_bottles
+    bottles.in_inventory
   end
 
   def shelveable_selection

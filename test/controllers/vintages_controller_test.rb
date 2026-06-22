@@ -51,7 +51,10 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
 
   test "show displays bottle purchase count" do
     vintage = Vintage.create!(vintage: "2024", wine: @wine)
-    bottle = Bottle.create!(personal_inventory: "A-001", vintage: vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink")
+    cellar = Cellar.create!(name: "Main")
+    bay = Bay.create!(cellar: cellar, label: "North")
+    shelf = Shelf.create!(shelveable: bay, number: "5")
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: vintage, purchase_date: Date.new(2026, 6, 6), disposal_method: "Drink", cellarable: shelf)
     Bottle.create!(vintage: vintage, disposal_method: "Drink")
 
     get vintage_url(vintage)
@@ -63,6 +66,8 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "dd", "2"
     assert_select "h2", "Bottles Purchased"
     assert_select "a[href=?]", bottle_path(bottle), "A-001"
+    assert_select "td", "Main Bay North Shelf 5"
+    assert_select "td", "Not Cellared"
     assert_select "a[href=?]", new_bottle_path(bottle: { vintage_id: vintage.id }), text: "New Bottle"
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_21_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -112,7 +112,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_21_120000) do
     t.index ["user_id"], name: "index_bottles_on_user_id"
     t.index ["vintage_id"], name: "index_bottles_on_vintage_id"
     t.check_constraint "cellarable_type IS NULL OR (cellarable_type::text = ANY (ARRAY['Cellar'::character varying, 'Bin'::character varying, 'Shelf'::character varying]::text[]))", name: "chk_bottles_cellarable_type"
-    t.check_constraint "disposal_method IS NULL OR (disposal_method = ANY (ARRAY['Drink'::text, 'Gift'::text, 'Sale'::text, 'Spoiled'::text]))", name: "chk_bottles_disposal_method"
+    t.check_constraint "disposal_method IS NULL OR (disposal_method = ANY (ARRAY['Drink'::text, 'Gift'::text, 'Sale'::text, 'Spoiled'::text, 'Inventory Adjustment'::text]))", name: "chk_bottles_disposal_method"
     t.check_constraint "purchase_date IS NULL OR disposal_date IS NULL OR disposal_date >= purchase_date", name: "chk_bottles_disposal_date_after_purchase_date"
   end
 

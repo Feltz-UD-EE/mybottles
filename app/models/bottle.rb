@@ -3,7 +3,7 @@ class Bottle < ApplicationRecord
 
   attr_accessor :quantity
 
-  DISPOSAL_METHODS = %w[Drink Gift Sale Spoiled].freeze
+  DISPOSAL_METHODS = [ "Drink", "Gift", "Sale", "Spoiled", "Inventory Adjustment" ].freeze
   AUTO_INVENTORY_FORMAT = /\A[A-Z0-9]+\z/
 
   belongs_to :vintage
@@ -15,6 +15,7 @@ class Bottle < ApplicationRecord
 
   scope :in_inventory, -> { where(disposal_date: nil) }
   scope :disposed, -> { where.not(disposal_date: nil) }
+  scope :uncellared, -> { where(cellarable_type: nil, cellarable_id: nil) }
 
   validates :list_price, :discount_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :disposal_method, inclusion: { in: DISPOSAL_METHODS }, allow_blank: true

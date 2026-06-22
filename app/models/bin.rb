@@ -23,4 +23,8 @@ class Bin < ApplicationRecord
   def current_bottle_count
     bottles.in_inventory.count
   end
+
+  def current_bottles
+    bottles.in_inventory
+  end
 end

@@ -22,4 +22,9 @@
     <dt>Notes</dt>
     <dd><%= simple_format(@shelf.notes) %></dd>
   </dl>
+
+  <section class="related-section">
+    <h2>Bottles Stored</h2>
+    <%= render "bottles/compact_table", bottles: @bottles, empty_message: "No bottles stored here." %>
+  </section>
 </main>

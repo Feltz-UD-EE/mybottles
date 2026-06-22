@@ -27,6 +27,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "th", "Tasted"
     assert_select "th", { text: "In Inventory", count: 0 }
     assert_select "a[href=?]", disposed_bottles_path, text: "Disposed Bottles"
+    assert_select "a[href=?]", uncellared_bottles_path, text: "Uncellared"
     assert_select "span.tasted-checkmark[aria-label='Tasted']", count: 1
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: @vintage.id }), text: "Add to Watch List"
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
@@ -261,7 +262,7 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name='bottle[vintage_id]'] option", "Producer - Estate Red (2024)"
     assert_select "select[name='bottle[cellarable_selection]'] option", "Not Cellared"
     assert_select "select[name='bottle[cellarable_selection]'] option", "Bin 3 - Everyday Spanish"
-    assert_select "select[name='bottle[cellarable_selection]'] option", "Bay North Shelf 5 - Aging Reds"
+    assert_select "select[name='bottle[cellarable_selection]'] option", "Main Bay North Shelf 5 - Aging Reds"
 
     option_texts = css_select("select[name='bottle[vintage_id]'] option").map(&:text)
     assert_operator option_texts.index("Alpha Producer - Alpha Wine (2023)"), :<,
@@ -301,6 +302,40 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
       delete bottle_url(bottle)
     end
     assert_redirected_to bottles_url
+  end
+
+  test "uncellared lists current bottles without locations" do
+    cellar = Cellar.create!(name: "Main")
+    uncellared_bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, purchase_date: Date.new(2026, 6, 6))
+    cellared_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage, cellarable: cellar)
+    disposed_uncellared_bottle = Bottle.create!(personal_inventory: "A-003", vintage: @vintage, disposal_date: Date.new(2026, 6, 7), disposal_method: "Drink")
+
+    get uncellared_bottles_url
+
+    assert_response :success
+    assert_select "h1", "Uncellared Bottles"
+    assert_select "a[href=?]", bottles_path, text: "Back to bottles"
+    assert_select "input[type='checkbox'][name='bottle_ids[]'][value=?]", uncellared_bottle.id
+    assert_select "td", "A-001"
+    assert_select "td", { text: cellared_bottle.personal_inventory, count: 0 }
+    assert_select "td", { text: disposed_uncellared_bottle.personal_inventory, count: 0 }
+    assert_select "input[type='submit'][value='Adjust inventory']"
+  end
+
+  test "adjust uncellared inventory disposes checked uncellared bottles" do
+    cellar = Cellar.create!(name: "Main")
+    selected_bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage)
+    other_uncellared_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage)
+    cellared_bottle = Bottle.create!(personal_inventory: "A-003", vintage: @vintage, cellarable: cellar)
+
+    patch adjust_uncellared_inventory_bottles_url, params: { bottle_ids: [ selected_bottle.id, cellared_bottle.id ] }
+
+    assert_redirected_to uncellared_bottles_url
+    assert_equal "1 bottle adjusted.", flash[:notice]
+    assert_equal "Inventory Adjustment", selected_bottle.reload.disposal_method
+    assert_equal Date.current, selected_bottle.disposal_date
+    assert_nil other_uncellared_bottle.reload.disposal_method
+    assert_nil cellared_bottle.reload.disposal_method
   end
 
   test "creates bottle with generated inventory when personal inventory is blank" do

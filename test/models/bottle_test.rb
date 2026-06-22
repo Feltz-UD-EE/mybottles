@@ -20,6 +20,10 @@ class BottleTest < ActiveSupport::TestCase
     assert bottle.valid?
     assert_nil bottle.disposal_method
 
+    bottle.disposal_method = "Inventory Adjustment"
+
+    assert bottle.valid?
+
     bottle.disposal_method = "Other"
 
     assert_not bottle.valid?

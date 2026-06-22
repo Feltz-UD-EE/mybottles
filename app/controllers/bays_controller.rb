@@ -7,6 +7,7 @@ class BaysController < ApplicationController
 
   def show
     @shelves = @bay.shelves.order(:number)
+    @bottles = @bay.current_bottles.includes(vintage: { wine: :producer }).order(:personal_inventory, :auto_inventory)
   end
 
   def new
