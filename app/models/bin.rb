@@ -16,6 +16,10 @@ class Bin < ApplicationRecord
     display_name
   end
 
+  def cellarable_selection_name
+    [ "Bin #{location}".strip, label ].compact_blank.join(" - ")
+  end
+
   def current_bottle_count
     bottles.in_inventory.count
   end

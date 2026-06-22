@@ -25,6 +25,12 @@ class Shelf < ApplicationRecord
     end
   end
 
+  def cellarable_selection_name
+    shelf_name = [ bay_selection_name, "Shelf #{number}".strip ].compact_blank.join(" ")
+
+    [ shelf_name, label ].compact_blank.join(" - ")
+  end
+
   def cellar
     shelveable.is_a?(Bay) ? shelveable.cellar : shelveable
   end
@@ -41,5 +47,11 @@ class Shelf < ApplicationRecord
     return if shelveable_type.blank? || shelveable_id.blank?
 
     "#{shelveable_type}:#{shelveable_id}"
+  end
+
+  private
+
+  def bay_selection_name
+    "Bay #{bay.label}".strip if bay
   end
 end

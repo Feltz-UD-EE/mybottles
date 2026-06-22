@@ -108,6 +108,31 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_tasting_note_path(tasting_note: { tasteable_type: "Bottle", tasteable_id: bottle.id }), text: "Tasted This"
   end
 
+  test "show lists other inventory bottles of the same wine by vintage" do
+    cellar = Cellar.create!(name: "Main")
+    bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, cellarable: cellar)
+    older_vintage = Vintage.create!(vintage: "2022", wine: @vintage.wine)
+    newer_vintage = Vintage.create!(vintage: "2025", wine: @vintage.wine)
+    older_bottle = Bottle.create!(personal_inventory: "A-002", vintage: older_vintage, cellarable: cellar)
+    newer_bottle = Bottle.create!(personal_inventory: "A-003", vintage: newer_vintage, cellarable: cellar)
+    disposed_bottle = Bottle.create!(personal_inventory: "A-004", vintage: older_vintage, cellarable: cellar, disposal_date: Date.new(2026, 6, 8), disposal_method: "Drink")
+    other_wine = Wine.create!(name: "Other Red", producer: @vintage.wine.producer)
+    other_wine_vintage = Vintage.create!(vintage: "2023", wine: other_wine)
+    other_wine_bottle = Bottle.create!(personal_inventory: "B-001", vintage: other_wine_vintage, cellarable: cellar)
+
+    get bottle_url(bottle)
+
+    assert_response :success
+    assert_select "h2", "Other Bottles of This Wine"
+    assert_select "a[href=?]", bottle_path(older_bottle), text: "A-002"
+    assert_select "a[href=?]", bottle_path(newer_bottle), text: "A-003"
+    assert_select "td", text: "Main", count: 2
+    assert_select "td", { text: "A-001", count: 0 }
+    assert_select "td", { text: disposed_bottle.personal_inventory, count: 0 }
+    assert_select "td", { text: other_wine_bottle.personal_inventory, count: 0 }
+    assert_operator response.body.index(older_bottle.personal_inventory), :<, response.body.index(newer_bottle.personal_inventory)
+  end
+
   test "show lists tasting notes for same vintage by date descending" do
     bottle = Bottle.create!(personal_inventory: "A-001", vintage: @vintage, disposal_method: "Drink")
     other_bottle = Bottle.create!(personal_inventory: "A-002", vintage: @vintage, disposal_method: "Drink")
@@ -223,6 +248,10 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     alpha_producer = Producer.create!(name: "Alpha Producer")
     alpha_wine = Wine.create!(name: "Alpha Wine", producer: alpha_producer)
     alpha_vintage = Vintage.create!(vintage: "2023", wine: alpha_wine)
+    cellar = Cellar.create!(name: "Main")
+    Bin.create!(cellar: cellar, location: "3", label: "Everyday Spanish")
+    bay = Bay.create!(cellar: cellar, label: "North")
+    Shelf.create!(shelveable: bay, number: "5", label: "Aging Reds")
 
     get new_bottle_url(bottle: { vintage_id: @vintage.id })
 
@@ -231,6 +260,8 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='bottle[quantity]'][value='1']"
     assert_select "select[name='bottle[vintage_id]'] option", "Producer - Estate Red (2024)"
     assert_select "select[name='bottle[cellarable_selection]'] option", "Not Cellared"
+    assert_select "select[name='bottle[cellarable_selection]'] option", "Bin 3 - Everyday Spanish"
+    assert_select "select[name='bottle[cellarable_selection]'] option", "Bay North Shelf 5 - Aging Reds"
 
     option_texts = css_select("select[name='bottle[vintage_id]'] option").map(&:text)
     assert_operator option_texts.index("Alpha Producer - Alpha Wine (2023)"), :<,
@@ -259,7 +290,8 @@ class BottlesControllerTest < ActionDispatch::IntegrationTest
     assert_equal cellar, bottle.cellarable
 
     patch bottle_url(bottle), params: { bottle: { personal_inventory: "A-003", vintage_id: @vintage.id, discount_price: "20.00", disposal_method: "Gift", disposal_date: "2026-06-07", cellarable_selection: "Bin:#{bin.id}" } }
-    assert_redirected_to bottle_url(bottle)
+    assert_redirected_to bottles_url
+    assert_equal "Producer - Estate Red - 2024 was successfully updated.", flash[:notice]
     assert_equal "A-003", bottle.reload.personal_inventory
     assert_equal "Gift", bottle.disposal_method
     assert_equal bin, bottle.cellarable

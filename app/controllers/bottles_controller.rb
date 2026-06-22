@@ -19,6 +19,7 @@ class BottlesController < ApplicationController
     @wine = @vintage.wine
     @producer = @wine.producer
     @tasting_notes = @bottle.tasting_notes_for_same_vintage
+    @same_wine_bottles = same_wine_bottles
     @print_label_url = safe_print_label_url(params[:print_label_url]) || label_bottle_path(@bottle)
   end
 
@@ -85,7 +86,7 @@ class BottlesController < ApplicationController
     valid_selection = apply_cellarable_selection(@bottle, selection)
 
     if valid_selection && @bottle.update(attributes)
-      redirect_to @bottle, notice: "Bottle was successfully updated."
+      redirect_to bottles_url, notice: "#{@bottle.display_name} was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -165,6 +166,17 @@ class BottlesController < ApplicationController
     URI.join(Rails.configuration.x.label_printing.base_url, bottle_path(bottle)).to_s
   end
 
+  def same_wine_bottles
+    Bottle
+      .visible_to(current_user)
+      .in_inventory
+      .joins(:vintage)
+      .where(vintages: { wine_id: @wine.id })
+      .where.not(id: @bottle.id)
+      .includes(:cellarable, vintage: { wine: :producer })
+      .order("vintages.vintage", :personal_inventory, :auto_inventory)
+  end
+
   def bottle_params
     params.expect(bottle: %i[ personal_inventory vintage_id purchase_date purchase_source list_price discount_price notes disposal_date disposal_method cellarable_selection quantity ])
   end
@@ -181,8 +193,8 @@ class BottlesController < ApplicationController
   def load_cellarable_options
     @cellarable_options = [ [ "Not Cellared", "" ] ] +
       Cellar.visible_to(current_user).order(:name).map { |cellar| [ cellar.name, "Cellar:#{cellar.id}" ] } +
-      Bin.visible_to(current_user).includes(:cellar).sort_by(&:display_name).map { |bin| [ bin.display_name, "Bin:#{bin.id}" ] } +
-      Shelf.visible_to(current_user).sort_by(&:location_name).map { |shelf| [ shelf.location_name, "Shelf:#{shelf.id}" ] }
+      Bin.visible_to(current_user).includes(:cellar).sort_by(&:display_name).map { |bin| [ bin.cellarable_selection_name, "Bin:#{bin.id}" ] } +
+      Shelf.visible_to(current_user).includes(:shelveable).sort_by(&:location_name).map { |shelf| [ shelf.cellarable_selection_name, "Shelf:#{shelf.id}" ] }
   end
 
   def apply_cellarable_selection(bottle, selection)

@@ -42,5 +42,34 @@
     <dd><%= @bottle.in_inventory? ? "Yes" : "No" %></dd>
   </dl>
 
+  <section class="related-section">
+    <h2>Other Bottles of This Wine</h2>
+
+    <div class="table-wrapper">
+      <table class="data-table data-table--compact">
+        <thead>
+          <tr>
+            <th>Inventory</th>
+            <th>Vintage</th>
+            <th>Purchase date</th>
+            <th>Source</th>
+            <th>On hand</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @same_wine_bottles.each do |bottle| %>
+            <tr>
+              <td><%= link_to bottle.inventory_code, bottle %></td>
+              <td><%= link_to bottle.vintage.vintage, bottle.vintage %></td>
+              <td><%= bottle.purchase_date&.iso8601 %></td>
+              <td><%= bottle.purchase_source %></td>
+              <td><%= bottle.location_name %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <%= render "tasting_notes/related_table", tasting_notes: @tasting_notes, context_bottle: @bottle %>
 </main>

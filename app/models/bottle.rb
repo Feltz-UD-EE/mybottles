@@ -62,6 +62,10 @@ class Bottle < ApplicationRecord
     cellarable&.location_name || "Not Cellared"
   end
 
+  def on_hand_display
+    in_inventory? ? location_name : "No"
+  end
+
   def cellarable_selection
     return if cellarable_type.blank? || cellarable_id.blank?
 
