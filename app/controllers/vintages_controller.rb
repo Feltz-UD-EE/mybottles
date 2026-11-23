@@ -8,6 +8,21 @@ class VintagesController < ApplicationController
     @tasted_vintage_ids = tasted_vintage_ids(@vintages)
   end
 
+  def search
+    query = params[:q].to_s.first(120).strip
+    return render json: [] if query.length < 2
+
+    vintages = visible_scope(Vintage).joins(wine: :producer)
+    query.split.each do |term|
+      pattern = "%#{Vintage.sanitize_sql_like(term)}%"
+      vintages = vintages.where("concat_ws(' - ', producers.name, wines.name, vintages.vintage) ILIKE ?", pattern)
+    end
+
+    results = vintages.order("producers.name", "wines.name", "vintages.vintage", "vintages.id")
+      .limit(20).preload(wine: :producer)
+    render json: results.map { |vintage| { id: vintage.id, label: vintage.display_name } }
+  end
+
   def show
     @pending_changes = ProposedChange.pending.for_target(@vintage).where(proposed_by_user: current_user)
     @bottles = @vintage.bottles.visible_to(current_user).order(:purchase_date, :personal_inventory, :auto_inventory)

@@ -24,20 +24,23 @@
       <%= hidden_field_tag "tasting_note[tasteable_type]", "Vintage" %>
       <%= hidden_field_tag "tasting_note[tasteable_id]", tasting_note.tasteable_id, data: { tasting_note_target: "tasteableId" } %>
 
-      <div class="field field-with-action">
-        <div>
-          <%= label_tag "tasting_note_vintage_lookup", "Vintage" %>
-          <%= text_field_tag "tasting_note[vintage_lookup]", tasting_note.tasteable.present? ? tasting_note.tasteable_name : nil, list: "vintage-options", data: { tasting_note_target: "vintageInput", action: "input->tasting-note#selectVintage" } %>
-          <datalist id="vintage-options">
-            <% @vintage_options.each do |vintage| %>
-              <option value="<%= "#{vintage.wine.producer.name} - #{vintage.wine.name} - #{vintage.vintage}" %>" data-id="<%= vintage.id %>"></option>
-            <% end %>
-          </datalist>
+      <div>
+        <div class="field field-with-action">
+          <div class="field">
+            <%= label_tag "tasting_note_vintage_lookup", "Find a wine or vintage" %>
+            <%= text_field_tag "tasting_note[vintage_lookup]", tasting_note.tasteable&.display_name,
+                  autocomplete: "off", maxlength: 120, placeholder: "Producer, wine, or vintage",
+                  data: { tasting_note_target: "vintageInput", search_url: search_vintages_path,
+                          action: "input->tasting-note#queueVintageSearch keydown.enter->tasting-note#focusVintageResults:prevent keydown.down->tasting-note#focusVintageResults:prevent" } %>
+          </div>
+          <button class="button" type="button" aria-controls="new-wine-fields" aria-expanded="false"
+                  data-tasting-note-target="newWineButton" data-action="tasting-note#showNewWine">New wine</button>
         </div>
-        <button class="button" type="button" data-action="tasting-note#showNewWine">New wine</button>
+        <div class="vintage-search-status" role="status" data-tasting-note-target="vintageStatus"></div>
+        <ul class="vintage-search-results" aria-label="Matching vintages" data-tasting-note-target="vintageResults"></ul>
       </div>
 
-      <div class="inline-fields" data-tasting-note-target="newWineFields" hidden>
+      <fieldset id="new-wine-fields" class="inline-fields" data-tasting-note-target="newWineFields" hidden disabled>
         <div class="field">
           <%= label_tag "new_wine_producer_name", "Producer" %>
           <%= text_field_tag "new_wine[producer_name]" %>
@@ -58,7 +61,7 @@
           <%= label_tag "new_wine_grapes", "Grapes" %>
           <%= text_area_tag "new_wine[grapes]" %>
         </div>
-      </div>
+      </fieldset>
     </section>
   <% end %>
 

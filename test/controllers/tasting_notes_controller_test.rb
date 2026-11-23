@@ -65,7 +65,8 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".error-messages", count: 0
-    assert_select "input[name='tasting_note[vintage_lookup]']"
+    assert_select "input[name='tasting_note[vintage_lookup]'][data-search-url=?]", search_vintages_path
+    assert_select "datalist", count: 0
     assert_select "input[name='tasting_note[rating]'][type='range']"
     assert_select "output[data-tasting-note-target='ratingOutput']"
     assert_select "[data-tasting-note-target='newWineFields'][hidden]"
@@ -112,6 +113,8 @@ class TastingNotesControllerTest < ActionDispatch::IntegrationTest
     assert_select ".error-messages", text: /Buy cannot be both Yes and No/
     assert_select "input[name='tasting_note[buy_yes]'][checked]"
     assert_select "input[name='tasting_note[buy_no]'][checked]"
+    assert_select "input[name='tasting_note[vintage_lookup]'][value=?]", @vintage.display_name
+    assert_select "input[name='tasting_note[tasteable_id]'][value=?]", @vintage.id
   end
 
   test "creates producer wine vintage and tasting note inline" do
