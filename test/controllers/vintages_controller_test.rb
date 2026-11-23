@@ -22,6 +22,37 @@ class VintagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", new_watch_list_entry_path(watch_list_entry: { watchable_type: "Vintage", watchable_id: Vintage.last.id }), text: "Add to Watch List"
   end
 
+  test "search matches producer wine and vintage terms within the user's visible catalog" do
+    basic = users(:basic)
+    approved = Vintage.create!(vintage: "2024", wine: @wine)
+    Vintage.create!(vintage: "2023", wine: @wine)
+    Vintage.create!(vintage: "2024 Private", wine: @wine, created_by_user: users(:trusted))
+    own = Vintage.create!(vintage: "2024 Reserve", wine: @wine, created_by_user: basic)
+    sign_in basic
+
+    get search_vintages_url, params: { q: "2024 EST prod" }, as: :json
+
+    assert_response :success
+    assert_equal [
+      { "id" => approved.id, "label" => "Producer - Estate Red - 2024" },
+      { "id" => own.id, "label" => "Producer - Estate Red - 2024 Reserve" }
+    ], response.parsed_body
+  end
+
+  test "search limits broad queries and treats SQL wildcards as literal characters" do
+    21.times { |index| Vintage.create!(vintage: (2000 + index).to_s, wine: @wine) }
+
+    get search_vintages_url, params: { q: "Estate" }, as: :json
+
+    assert_response :success
+    assert_equal 20, response.parsed_body.size
+
+    get search_vintages_url, params: { q: "Estate %" }, as: :json
+
+    assert_response :success
+    assert_empty response.parsed_body
+  end
+
   test "creates updates and deletes vintage" do
     assert_difference("Vintage.count", 1) do
       post vintages_url, params: { vintage: { vintage: "2024", wine_id: @wine.id, grapes: "Cabernet Sauvignon" } }

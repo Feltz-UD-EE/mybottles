@@ -1,6 +1,5 @@
 class TastingNotesController < ApplicationController
   before_action :set_tasting_note, only: %i[ show edit update destroy ]
-  before_action :load_vintage_options, only: %i[ new edit create update ]
 
   def index
     @tasting_notes = TastingNote.visible_to(current_user).includes(:tasteable).order(date: :desc)
@@ -134,9 +133,5 @@ class TastingNotesController < ApplicationController
     else
       redirect_to root_path, notice: "Tasting note was successfully created."
     end
-  end
-
-  def load_vintage_options
-    @vintage_options = Vintage.visible_to(current_user).includes(wine: :producer).order("producers.name", "wines.name", "vintages.vintage")
   end
 end

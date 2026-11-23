@@ -77,7 +77,9 @@ Rails.application.routes.draw do
 
   resources :producers
   resources :wines
-  resources :vintages
+  resources :vintages do
+    get :search, on: :collection
+  end
   resources :grapes
   resources :grape_synonyms, only: %i[ create edit update destroy ]
   resources :appellation_grapes, only: %i[ edit update destroy ]

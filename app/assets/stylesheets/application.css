@@ -470,6 +470,30 @@ a {
   align-items: end;
 }
 
+.vintage-search-status:not(:empty) {
+  margin-top: 8px;
+}
+
+.vintage-search-results {
+  display: grid;
+  gap: 4px;
+  max-height: 16rem;
+  overflow-y: auto;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+}
+
+.vintage-search-results:empty {
+  display: none;
+}
+
+.vintage-search-results .button {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+}
+
 .form-panel,
 .inline-fields {
   display: grid;
